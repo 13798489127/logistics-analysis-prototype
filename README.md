@@ -4,15 +4,13 @@
 
 ## 在线预览
 
-GitHub Pages 启用后的入口：
+在线预览入口：
 
 [打开安全系统原型](https://13798489127.github.io/logistics-analysis-prototype/)
 
 仓库根目录的 `index.html` 自动跳转到 `原型_医院智慧安全管理系统_v2.html`，也保留可点击链接。
 
-首次启用：在仓库 **Settings → Pages** 中选择 **Deploy from a branch**，分支选择 **main**，目录选择 **/(root)**，保存。之后推送到 `main` 会更新预览。
-
-私有仓库使用 GitHub Pages 需要账户计划支持；如果设置页提示升级，请先确认所需计划。
+GitHub Pages 已配置为 **Deploy from a branch**，从 **main** 分支的 **/(root)** 发布。之后推送到 `main` 会自动更新预览。
 
 ## 本地预览与测试
 

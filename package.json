@@ -1,0 +1,8 @@
+{
+  "name": "logistics-analysis-prototype",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/preview.test.cjs",
+    "preview": "python3 -m http.server 8080 --bind 127.0.0.1"
+  }
+}

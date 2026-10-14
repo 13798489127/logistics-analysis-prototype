@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>医院智慧安全管理系统 · 可交互原型 v2</title>
+<style>
+:root{
+  --primary:#1b6fd1; --primary-d:#155bb0; --primary-l:#e8f2fc;
+  --bg:#f3f5f8; --panel:#ffffff; --line:#e3e8ef; --text:#2b3440; --text2:#7a8699;
+  --red:#d64541; --orange:#e88a1d; --yellow:#e6b800; --green:#2ba471; --blue:#1b6fd1;
+  --radius:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei","PingFang SC",sans-serif;}
+body{background:var(--bg);color:var(--text);font-size:14px;}
+button{cursor:pointer;border:none;background:none;font-family:inherit;}
+/* ===== 顶部 ===== */
+#topbar{height:52px;background:linear-gradient(90deg,#123f7b,#1b6fd1);color:#fff;display:flex;align-items:center;padding:0 20px;gap:16px;position:sticky;top:0;z-index:100;}
+#topbar .logo{font-size:17px;font-weight:700;letter-spacing:1px;}
+#topbar .logo small{font-size:11px;opacity:.75;margin-left:8px;font-weight:400;}
+.env-switch{margin-left:auto;display:flex;background:rgba(255,255,255,.15);border-radius:20px;padding:3px;}
+.env-switch button{color:#dcebfb;padding:5px 18px;border-radius:16px;font-size:13px;}
+.env-switch button.on{background:#fff;color:var(--primary);font-weight:700;}
+.tenant-tag{font-size:12px;background:rgba(255,255,255,.18);padding:4px 12px;border-radius:12px;}
+/* ===== PC 布局 ===== */
+#pc{display:flex;height:calc(100vh - 52px);}
+#side{width:198px;background:#16263d;color:#b9c6d8;padding:12px 0;overflow-y:auto;flex-shrink:0;}
+#side .grp{padding:10px 18px 4px;font-size:11px;color:#5f7590;letter-spacing:2px;}
+#side .mi{padding:10px 18px;font-size:13.5px;cursor:pointer;border-left:3px solid transparent;display:flex;gap:9px;align-items:center;}
+#side .mi:hover{background:#1d3350;color:#fff;}
+#side .mi.on{background:#1d3350;color:#fff;border-left-color:var(--primary);}
+#side .mi .ic{width:17px;text-align:center;}
+#main{flex:1;overflow-y:auto;padding:18px 22px;}
+.page{display:none;}
+.page.on{display:block;animation:fade .25s;}
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;}}
+h2.pt{font-size:18px;margin-bottom:4px;}
+.pt-sub{color:var(--text2);font-size:12.5px;margin-bottom:16px;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px;}
+.card h3{font-size:14.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.card h3 .dot{width:4px;height:14px;background:var(--primary);border-radius:2px;display:inline-block;}
+.grid{display:grid;gap:14px;}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;}
+.stat .n{font-size:26px;font-weight:700;margin:4px 0;}
+.stat .l{color:var(--text2);font-size:12.5px;}
+table.tb{width:100%;border-collapse:collapse;font-size:13px;}
+table.tb th{background:#f7f9fc;color:var(--text2);font-weight:600;text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);}
+table.tb td{padding:10px 12px;border-bottom:1px solid #eef1f5;}
+table.tb tr:hover td{background:#f8fbff;}
+.tag{display:inline-block;padding:2px 9px;border-radius:10px;font-size:12px;white-space:nowrap;}
+.tag.red{background:#fdeceb;color:var(--red);} .tag.orange{background:#fdf3e3;color:var(--orange);}
+.tag.yellow{background:#fdf8dd;color:#a08800;} .tag.green{background:#e6f6ef;color:var(--green);}
+.tag.blue{background:var(--primary-l);color:var(--primary);} .tag.gray{background:#eef1f5;color:var(--text2);}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 15px;border-radius:6px;font-size:13px;border:1px solid var(--line);background:#fff;color:var(--text);}
+.btn:hover{border-color:var(--primary);color:var(--primary);}
+.btn.pri{background:var(--primary);border-color:var(--primary);color:#fff;}
+.btn.pri:hover{background:var(--primary-d);}
+.btn.sm{padding:4px 10px;font-size:12px;}
+.btn.danger{color:var(--red);} .btn.danger:hover{border-color:var(--red);}
+.tl{position:relative;padding-left:22px;}
+.tl::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:#dbe4ee;}
+.tl .ti{position:relative;padding-bottom:16px;}
+.tl .ti::before{content:"";position:absolute;left:-20px;top:4px;width:10px;height:10px;border-radius:50%;background:#c3d2e4;border:2px solid #fff;box-shadow:0 0 0 2px #dbe4ee;}
+.tl .ti.done::before{background:var(--green);box-shadow:0 0 0 2px #bfe8d6;}
+.tl .ti.cur::before{background:var(--orange);box-shadow:0 0 0 2px #f6dcae;}
+.tl .ti .tt{font-weight:600;font-size:13.5px;}
+.tl .ti .td{font-size:12.5px;color:var(--text2);margin-top:3px;line-height:1.6;}
+.kv{display:grid;grid-template-columns:110px 1fr;row-gap:8px;font-size:13px;}
+.kv .k{color:var(--text2);}
+.brain-box{background:linear-gradient(135deg,#eef6ff,#f5f0ff);border:1px solid #cfdef5;border-radius:var(--radius);padding:14px 16px;}
+.brain-box .bh{display:flex;align-items:center;gap:7px;font-weight:700;color:#3a4fd0;margin-bottom:8px;font-size:13.5px;}
+.warn-line{display:flex;gap:8px;align-items:flex-start;padding:7px 10px;background:#fff;border-radius:6px;margin-bottom:6px;font-size:12.8px;border:1px solid #f0e2d0;}
+.mono{font-family:Consolas,monospace;background:#f2f4f8;padding:2px 6px;border-radius:4px;font-size:12.5px;}
+.switch{position:relative;width:38px;height:20px;background:#ccd5e0;border-radius:10px;transition:.2s;display:inline-block;vertical-align:middle;}
+.switch.on{background:var(--green);}
+.switch::after{content:"";position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.2s;}
+.switch.on::after{left:20px;}
+.pill-tab{display:inline-flex;background:#eef1f6;border-radius:8px;padding:3px;margin-bottom:14px;}
+.pill-tab button{padding:6px 16px;border-radius:6px;font-size:13px;color:var(--text2);}
+.pill-tab button.on{background:#fff;color:var(--primary);font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.08);}
+/* 平面图 */
+.plan-wrap{display:flex;gap:14px;}
+.plan-svg-box{flex:1;background:#fbfcfe;border:1px solid var(--line);border-radius:var(--radius);padding:10px;}
+.plan-legend{display:flex;gap:14px;flex-wrap:wrap;padding:10px 4px 0;font-size:12.5px;color:var(--text2);}
+.plan-legend span{display:inline-flex;align-items:center;gap:5px;cursor:pointer;user-select:none;}
+.plan-legend i{width:11px;height:11px;border-radius:50%;display:inline-block;}
+.layer-off{opacity:.35;}
+/* 手机 */
+#mp{display:none;justify-content:center;padding:26px 0 40px;background:var(--bg);}
+#mp.on{display:flex;}
+.phone{width:375px;height:760px;background:#fff;border-radius:36px;border:10px solid #1a1d23;overflow:hidden;position:relative;box-shadow:0 18px 50px rgba(20,40,80,.25);display:flex;flex-direction:column;}
+.p-status{height:30px;display:flex;justify-content:center;align-items:center;font-size:11px;color:#888;background:#f7f8fa;flex-shrink:0;}
+.p-head{background:linear-gradient(135deg,#123f7b,#1b6fd1);color:#fff;padding:14px 16px 18px;flex-shrink:0;}
+.p-body{flex:1;overflow-y:auto;background:#f5f7fa;padding:12px;}
+.p-tab{height:52px;border-top:1px solid var(--line);display:flex;background:#fff;flex-shrink:0;}
+.p-tab button{flex:1;font-size:11px;color:#98a2b3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
+.p-tab button.on{color:var(--primary);}
+.p-tab .ti{font-size:18px;}
+.mcard{background:#fff;border-radius:10px;padding:13px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(30,50,90,.05);}
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;}
+.mgrid .gi{padding:10px 2px;cursor:pointer;}
+.mgrid .gi .ic{font-size:22px;}
+.mgrid .gi .t{font-size:11.5px;color:#4a5568;margin-top:4px;}
+.svc-chip{display:inline-block;padding:5px 13px;border-radius:14px;font-size:12.5px;border:1px solid var(--line);color:var(--text2);background:#fff;cursor:pointer;}
+.svc-chip.on{background:var(--primary);color:#fff;border-color:var(--primary);}
+.mbtn{width:100%;padding:12px;border-radius:8px;background:var(--primary);color:#fff;font-size:14.5px;font-weight:600;}
+.mbtn.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary);}
+.chk{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid #f0f2f6;font-size:13.5px;}
+.chk .st{margin-left:auto;display:flex;gap:8px;}
+.chk .st button{padding:4px 13px;border-radius:14px;font-size:12px;border:1px solid var(--line);color:var(--text2);}
+.chk .st button.ok{background:#e6f6ef;color:var(--green);border-color:#bfe8d6;}
+.chk .st button.bad{background:#fdeceb;color:var(--red);border-color:#f5c6c4;}
+.photo-box{border:2px dashed #c9d5e4;border-radius:10px;height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#8ba0bb;gap:6px;cursor:pointer;background:#fafcfe;}
+.ai-card{border:1.5px solid #b9a8f0;background:linear-gradient(135deg,#f7f4ff,#eef4ff);border-radius:10px;padding:12px 14px;}
+.ai-card .ah{display:flex;align-items:center;gap:6px;color:#5b3fd4;font-weight:700;font-size:13px;margin-bottom:8px;}
+.quiz-q{padding:12px 0;border-bottom:1px solid #f0f2f6;}
+.quiz-q .q{font-weight:600;margin-bottom:9px;font-size:13.5px;line-height:1.5;}
+.quiz-q label{display:flex;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:7px;font-size:13px;cursor:pointer;}
+.quiz-q label.sel{border-color:var(--primary);background:var(--primary-l);}
+/* 智能助手 */
+#assistBtn{position:fixed;right:26px;bottom:26px;width:54px;height:54px;border-radius:50%;background:var(--primary);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(27,111,209,.4);z-index:200;cursor:pointer;}
+#assistPanel{position:fixed;right:26px;bottom:92px;width:360px;height:480px;background:#fff;border-radius:14px;box-shadow:0 14px 44px rgba(20,40,80,.25);display:none;flex-direction:column;overflow:hidden;z-index:200;border:1px solid var(--line);}
+#assistPanel.open{display:flex;}
+.ap-h{background:linear-gradient(90deg,#123f7b,#1b6fd1);color:#fff;padding:12px 14px;font-size:13.5px;font-weight:600;}
+.ap-h small{display:block;font-weight:400;font-size:11px;opacity:.8;margin-top:2px;}
+.ap-b{flex:1;overflow-y:auto;padding:12px;background:#f5f7fa;}
+.msg{max-width:85%;padding:9px 12px;border-radius:10px;font-size:12.8px;line-height:1.65;margin-bottom:10px;}
+.msg.u{background:var(--primary);color:#fff;margin-left:auto;border-bottom-right-radius:2px;}
+.msg.a{background:#fff;border:1px solid var(--line);border-bottom-left-radius:2px;}
+.msg .act{display:inline-block;margin-top:7px;padding:5px 12px;border-radius:6px;background:var(--primary);color:#fff;font-size:12px;cursor:pointer;}
+.msg .act.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary);}
+.ap-quick{display:flex;gap:6px;padding:8px 10px 4px;flex-wrap:wrap;background:#fff;border-top:1px solid var(--line);}
+.ap-quick button{font-size:11.5px;padding:4px 10px;border:1px solid var(--line);border-radius:12px;color:var(--text2);}
+.ap-quick button:hover{border-color:var(--primary);color:var(--primary);}
+.ap-i{display:flex;gap:8px;padding:10px;background:#fff;}
+.ap-i input{flex:1;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;outline:none;}
+.ap-i input:focus{border-color:var(--primary);}
+.ap-i button{background:var(--primary);color:#fff;border-radius:8px;padding:0 16px;font-size:13px;}
+#toast{position:fixed;top:66px;left:50%;transform:translateX(-50%);background:#2b3440;color:#fff;padding:9px 22px;border-radius:20px;font-size:13px;opacity:0;pointer-events:none;transition:.3s;z-index:999;}
+#toast.show{opacity:.94;}
+.approval-chain{display:flex;align-items:center;gap:0;flex-wrap:wrap;}
+.ap-node{text-align:center;padding:0 2px;}
+.ap-node .circle{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;margin:0 auto 5px;background:#eef1f5;color:var(--text2);border:2px solid #dbe1ea;}
+.ap-node.done .circle{background:#e6f6ef;color:var(--green);border-color:#9fd9bd;}
+.ap-node.cur .circle{background:#fdf3e3;color:var(--orange);border-color:#f0c98a;}
+.ap-node .nm{font-size:12px;color:var(--text2);}
+.ap-arrow{width:44px;height:2px;background:#dbe1ea;margin:0 6px 20px;}
+</style>
+</head>
+<body>
+<div id="topbar">
+  <div class="logo">🏥 医院智慧安全管理系统 <small>可交互原型 v2.4（新增报事服务台+第三方供应商绩效+科内任务开关）· 数据均为演示数据</small></div>
+  <span class="tenant-tag">租户：示例三甲医院（多租户模式）</span>
+  <div class="env-switch">
+    <button id="btnPC" class="on" onclick="switchEnv('pc')">🖥 PC 管理端</button>
+    <button id="btnMP" onclick="switchEnv('mp')">📱 微信小程序端</button>
+  </div>
+</div>
+
+<!-- ==================== PC 端 ==================== -->
+<div id="pc">
+  <div id="side">
+    <div class="grp">工作</div>
+    <div class="mi on" data-p="dash"><span class="ic">📊</span>工作台</div>
+    <div class="mi" data-p="dispatch"><span class="ic">🎯</span>接警研判台</div>
+    <div class="mi" data-p="orders"><span class="ic">📋</span>隐患工单</div>
+    <div class="grp">摸底建档</div>
+    <div class="mi" data-p="archive"><span class="ic">🏢</span>档案与平面图</div>
+    <div class="mi" data-p="assess"><span class="ic">🩺</span>合规体检报告</div>
+    <div class="grp">业务模块</div>
+    <div class="mi" data-p="selfcheck"><span class="ic">✅</span>风险区自查</div>
+    <div class="mi" data-p="train"><span class="ic">🎓</span>安全培训</div>
+    <div class="mi" data-p="permit"><span class="ic">🔥</span>危险作业票</div>
+    <div class="mi" data-p="equip"><span class="ic">🛗</span>特种设备</div>
+    <div class="mi" data-p="svc"><span class="ic">📢</span>报事服务台</div>
+    <div class="mi" data-p="task"><span class="ic">📌</span>科内任务</div>
+    <div class="grp">智能调度</div>
+    <div class="mi" data-p="deploy"><span class="ic">🚀</span>工作部署台</div>
+    <div class="grp">数据与决策</div>
+    <div class="mi" data-p="report"><span class="ic">📈</span>安全运行报告</div>
+    <div class="mi" data-p="vendor"><span class="ic">🤝</span>供应商绩效</div>
+    <div class="grp">安全大脑</div>
+    <div class="mi" data-p="rules"><span class="ic">⚙️</span>规则配置</div>
+    <div class="mi" data-p="kb"><span class="ic">📚</span>标准知识库</div>
+    <div class="grp">系统</div>
+    <div class="mi" data-p="sys"><span class="ic">🛠</span>系统管理</div>
+  </div>
+  <div id="main">
+
+    <!-- 工作台 -->
+    <div class="page on" id="p-dash">
+      <h2 class="pt">工作台</h2><div class="pt-sub">安保科 · 王科长 · 2026-10-04 星期日</div>
+      <div class="grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat"><div class="l">待研判事件</div><div class="n" style="color:var(--orange)">5</div><div class="l">较昨日 +2</div></div>
+        <div class="stat"><div class="l">进行中工单</div><div class="n" style="color:var(--primary)">12</div><div class="l">3 单临近超时</div></div>
+        <div class="stat"><div class="l">今日巡查完成率</div><div class="n" style="color:var(--green)">86%</div><div class="l">42 / 49 点位</div></div>
+        <div class="stat"><div class="l">本月隐患按期整改率</div><div class="n">93.2%</div><div class="l">环比 +1.8%</div></div>
+      </div>
+      <div class="grid" style="grid-template-columns:1.4fr 1fr;margin-top:14px;">
+        <div class="card">
+          <h3><span class="dot"></span>我的待办</h3>
+          <table class="tb">
+            <tr><th>事项</th><th>类型</th><th>等级</th><th>剩余时限</th><th>操作</th></tr>
+            <tr><td>住院部3F疏散通道被病床占用</td><td>隐患研判</td><td><span class="tag red">二级</span></td><td style="color:var(--red)">18 分钟</td><td><button class="btn sm pri" onclick="go('dispatch')">去研判</button></td></tr>
+            <tr><td>动火作业票申请 · 食堂燃气管道维修</td><td>作业票审批</td><td><span class="tag orange">高</span></td><td>4 小时</td><td><button class="btn sm" onclick="go('permit')">去审批</button></td></tr>
+            <tr><td>氧站自查任务逾期未提交</td><td>自查升级</td><td><span class="tag yellow">提醒</span></td><td>已逾期 2h</td><td><button class="btn sm" onclick="go('selfcheck')">查看</button></td></tr>
+            <tr><td>灭火器批量临期预警（12 具 30 天内到期）</td><td>大脑预警</td><td><span class="tag yellow">提醒</span></td><td>—</td><td><button class="btn sm" onclick="toast('已生成采购/换药建议清单')">生成清单</button></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>🧠 大脑实时监测</h3>
+          <div class="brain-box">
+            <div class="bh">动态判别中 · 今日已触发 7 条</div>
+            <div class="warn-line">⚠️ <div><b>2 号楼老楼</b>按 GB 55037-2022 判定：2 项差异项（楼梯净宽 1.05m＜1.1m）<div style="color:var(--text2);font-size:12px">提醒式 · 已纳入年度体检差异项</div></div></div>
+            <div class="warn-line">🔔 <div><b>药剂科</b>贵重药品库自查已 3 天未执行<div style="color:var(--text2);font-size:12px">命中院规「重点库房每日自查」· 闭环式 · 已自动开单</div></div></div>
+            <div class="warn-line">📸 <div><b>AI 随手拍</b>识别 1 起疑似违规用电（病房私拉插线板）<div style="color:var(--text2);font-size:12px">置信度 87% · 待人工确认</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 接警研判台 -->
+    <div class="page" id="p-dispatch">
+      <h2 class="pt">接警研判台</h2><div class="pt-sub">多渠道统一受理：随手拍 / 巡查异常 / AI 识别 / 一键报警 / 来电登记</div>
+      <div class="grid" style="grid-template-columns:300px 1fr 320px;">
+        <div class="card" style="padding:10px;">
+          <h3><span class="dot"></span>受理池（5）</h3>
+          <div class="mcard" style="border-left:3px solid var(--red);cursor:pointer;background:#fff7f7;">
+            <b style="font-size:13px">疏散通道被占用</b><span class="tag red" style="float:right">新</span>
+            <div style="font-size:12px;color:var(--text2);margin-top:5px">住院部 3F · 随手拍+AI · 5 分钟前</div>
+          </div>
+          <div class="mcard" style="border-left:3px solid var(--orange);">
+            <b style="font-size:13px">灭火器压力不足</b>
+            <div style="font-size:12px;color:var(--text2);margin-top:5px">门诊 1F · 巡查异常 · 22 分钟前</div>
+          </div>
+          <div class="mcard" style="border-left:3px solid var(--orange);">
+            <b style="font-size:13px">病房私拉插线板</b>
+            <div style="font-size:12px;color:var(--text2);margin-top:5px">内科 5F · AI 随手拍 · 40 分钟前</div>
+          </div>
+          <div class="mcard" style="border-left:3px solid #b9c6d8;">
+            <b style="font-size:13px">安全出口指示灯不亮</b>
+            <div style="font-size:12px;color:var(--text2);margin-top:5px">2 号楼 2F · 来电登记 · 1 小时前</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>事件详情 · 疏散通道被占用</h3>
+          <div class="kv" style="grid-template-columns:100px 1fr 100px 1fr;">
+            <span class="k">来源</span><span>随手拍（内科护士 李**）</span><span class="k">时间</span><span>17:32</span>
+            <span class="k">位置</span><span>住院部 3F 东侧走廊</span><span class="k">定位</span><span style="color:var(--primary);cursor:pointer" onclick="go('archive')">📍 平面图查看</span>
+          </div>
+          <div style="margin:12px 0;display:flex;gap:10px;">
+            <div style="width:150px;height:100px;background:#dfe6ef;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#8ba0bb;font-size:12px;">现场照片 1</div>
+            <div style="width:150px;height:100px;background:#dfe6ef;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#8ba0bb;font-size:12px;">现场照片 2</div>
+          </div>
+          <div class="brain-box">
+            <div class="bh">🧠 大脑研判建议</div>
+            <div style="font-size:13px;line-height:2">
+              建议等级：<span class="tag red">二级 · 5 分钟到场处置</span><br>
+              判定依据：<span class="mono">GB 55037-2022 第 7.1.5 条</span> 疏散通道应保持畅通，不得占用、堵塞<br>
+              命中规则：<span class="mono">R-FIRE-012 疏散通道占用</span>（闭环式）<br>
+              历史比对：该点位 90 天内第 3 次同类事件，建议纳入重点巡查点位<br>
+              推荐处置卡：<b>SC-001 疏散/秩序类场景处置卡</b>
+            </div>
+            <button class="btn sm pri" style="margin-top:8px" onclick="toast('处置卡已推送至班组手机，按步骤勾选执行并自动留痕')">📤 应用该卡并推送现场</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>派单处置</h3>
+          <div class="kv" style="grid-template-columns:90px 1fr;">
+            <span class="k">处置等级</span><span><span class="tag red">二级</span> <span style="font-size:12px;color:var(--text2)">采纳大脑建议</span></span>
+            <span class="k">派往</span><span>住院部保安班组 · 张班长</span>
+            <span class="k">到场时限</span><span>5 分钟（超时升级科长）</span>
+            <span class="k">预案</span><span style="font-size:12.5px;line-height:1.8">☑ 现场清理占用物<br>☑ 拍照前后对比回传<br>☑ 告知责任科室护士长<br>☑ 验收后归档</span>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:10px;">
+            <button class="btn pri" style="flex:1" onclick="toast('已派单至住院部保安班组，微信消息已推送')">确认派单</button>
+            <button class="btn" onclick="toast('已调整等级为三级（限时整改）')">调整等级</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 隐患工单 -->
+    <div class="page" id="p-orders">
+      <h2 class="pt">隐患工单</h2><div class="pt-sub">全渠道隐患统一闭环 · 统一工单引擎驱动</div>
+      <div class="card">
+        <div class="pill-tab">
+          <button class="on">全部 28</button><button>待研判 5</button><button>处置中 9</button><button>待验收 3</button><button style="color:var(--red)">超时 2</button><button>已归档 11</button>
+        </div>
+        <table class="tb">
+          <tr><th>单号</th><th>隐患描述</th><th>位置</th><th>等级</th><th>状态</th><th>当前处理人</th><th>剩余时限</th><th>操作</th></tr>
+          <tr style="cursor:pointer" onclick="document.getElementById('orderDetail').style.display='block'"><td class="mono">YH20261004012</td><td>疏散通道被病床占用</td><td>住院部3F</td><td><span class="tag red">二级</span></td><td><span class="tag orange">处置中</span></td><td>张班长</td><td>3 天</td><td><button class="btn sm">详情</button></td></tr>
+          <tr><td class="mono">YH20261004011</td><td>灭火器压力不足</td><td>门诊1F</td><td><span class="tag yellow">三级</span></td><td><span class="tag blue">已派单</span></td><td>门诊班组</td><td>2 天</td><td><button class="btn sm">详情</button></td></tr>
+          <tr><td class="mono">YH20261003088</td><td>配电室堆放杂物</td><td>2号楼B1</td><td><span class="tag red">二级</span></td><td><span class="tag red">超时未接单</span></td><td>已升级科长</td><td style="color:var(--red)">超 1h</td><td><button class="btn sm">详情</button></td></tr>
+          <tr><td class="mono">YH20261003075</td><td>病房私拉插线板</td><td>内科5F</td><td><span class="tag yellow">三级</span></td><td><span class="tag green">待验收</span></td><td>王科长</td><td>—</td><td><button class="btn sm">验收</button></td></tr>
+        </table>
+      </div>
+      <div class="card" id="orderDetail" style="display:none">
+        <h3><span class="dot"></span>工单 YH20261004012 · 全过程时间线
+          <span style="margin-left:auto;display:flex;gap:8px;">
+            <button class="btn sm" onclick="toast('已导出《隐患整改通知单》PDF，可打印线下签字')">📄 导出整改单</button>
+            <button class="btn sm danger" onclick="toast('已退回重办，处置时限重新计时')">退回重办</button>
+            <button class="btn sm pri" onclick="toast('验收通过，已归档并回写档案（该点位隐患次数+1）')">验收通过</button>
+          </span>
+        </h3>
+        <div class="grid" style="grid-template-columns:1.5fr 1fr;">
+          <div class="tl">
+            <div class="ti done"><div class="tt">上报 · 随手拍（AI 辅助）</div><div class="td">17:32 内科护士李** · AI 预识别「疏散通道占用」置信度 87% · 上报人采纳建议</div></div>
+            <div class="ti done"><div class="tt">接警研判</div><div class="td">17:38 值班员 定级二级 · 采纳大脑建议 · 引用 GB 55037-2022 §7.1.5</div></div>
+            <div class="ti done"><div class="tt">派单</div><div class="td">17:39 → 住院部保安班组 张班长 · 微信消息已送达</div></div>
+            <div class="ti done"><div class="tt">接单到场</div><div class="td">17:43 张班长接单 · 定位打卡（用时 4 分钟，未超时）</div></div>
+            <div class="ti cur"><div class="tt">现场处置中</div><div class="td">已上传处置前照片 · 等待处置完成回传</div></div>
+            <div class="ti"><div class="tt">验收归档</div><div class="td">验收通过后自动归档 · 档案回写该点位隐患记录</div></div>
+          </div>
+          <div>
+            <div class="brain-box">
+              <div class="bh">🧠 大脑关联提示</div>
+              <div style="font-size:12.8px;line-height:1.9">该点位 90 天内第 3 次占用，均为探视高峰时段。建议：① 增设陪护床集中存放区（过渡措施）；② 该点位巡查频次提至每 2 小时一次（可一键下发）。</div>
+              <button class="btn sm pri" style="margin-top:8px" onclick="toast('已调整该点位巡查计划：每 2 小时一次')">采纳建议 · 调整巡查计划</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 摸底建档 + 平面图 -->
+    <div class="page" id="p-archive">
+      <h2 class="pt">摸底建档 · 档案与平面图</h2><div class="pt-sub">院区 → 楼宇 → 楼层 → 点位 · 平面图可视化标注 · 档案与图双向关联</div>
+      <div class="grid" style="grid-template-columns:250px 1fr;">
+        <div class="card" style="padding:12px;">
+          <h3><span class="dot"></span>空间结构</h3>
+          <div style="font-size:13px;line-height:2.1;">
+            🏥 <b>东院区</b><br>
+            &nbsp;&nbsp;├ 🏢 1 号楼（门诊）<span class="tag green" style="margin-left:4px">2019·现行标准</span><br>
+            &nbsp;&nbsp;│&nbsp;&nbsp;├ 1F 门诊大厅<br>
+            &nbsp;&nbsp;│&nbsp;&nbsp;├ 2F 检验科<br>
+            &nbsp;&nbsp;│&nbsp;&nbsp;└ 3F 超声科<br>
+            &nbsp;&nbsp;└ 🏢 2 号楼（住院）<span class="tag yellow" style="margin-left:4px">1998·老标准</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├ 1F 出入院处<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├ 2F 外科病房<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└ <span style="color:var(--primary);font-weight:600">3F 内科病房 ◀</span><br>
+            🏥 <b>西院区</b>（医技楼 / 后勤楼）
+          </div>
+          <button class="btn sm" style="width:100%;margin-top:10px" onclick="toast('新增楼宇：填写建成年代后自动匹配适用标准版本')">+ 新增楼宇</button>
+        </div>
+        <div>
+          <div class="card">
+            <h3><span class="dot"></span>2 号楼 · 3F 平面图
+              <span style="margin-left:auto;display:flex;gap:8px;">
+                <button class="btn sm" onclick="toast('进入标注模式：可拖拽放置灭火器/消火栓/出口等点位')">📍 标注点位</button>
+                <button class="btn sm" onclick="toast('进入圈划模式：在图上绘制风险区多边形')">🟥 圈划风险区</button>
+                <button class="btn sm" onclick="toast('重新上传本层 CAD 图纸/图片底图')">🖼 更换底图</button>
+              </span>
+            </h3>
+            <div class="plan-wrap">
+              <div class="plan-svg-box">
+                <svg viewBox="0 0 640 360" width="100%" style="display:block">
+                  <!-- 底图：楼层平面示意 -->
+                  <rect x="20" y="20" width="600" height="320" fill="#f4f7fb" stroke="#9fb2c8" stroke-width="2"/>
+                  <!-- 走廊 -->
+                  <rect x="20" y="150" width="600" height="60" fill="#e8eef6" stroke="#b9c8da"/>
+                  <text x="300" y="185" font-size="12" fill="#8ba0bb">走廊（疏散通道）</text>
+                  <!-- 病房 -->
+                  <g stroke="#b9c8da" fill="#fdfdfe">
+                    <rect x="20" y="20" width="140" height="130"/><rect x="160" y="20" width="140" height="130"/>
+                    <rect x="300" y="20" width="140" height="130"/><rect x="440" y="20" width="180" height="130"/>
+                    <rect x="20" y="210" width="140" height="130"/><rect x="160" y="210" width="140" height="130"/>
+                    <rect x="300" y="210" width="140" height="130"/><rect x="440" y="210" width="180" height="130"/>
+                  </g>
+                  <g font-size="11" fill="#7a8699">
+                    <text x="60" y="85">病房 301</text><text x="200" y="85">病房 302</text>
+                    <text x="330" y="85">护士站</text><text x="480" y="85">配药室</text>
+                    <text x="55" y="275">病房 305</text><text x="195" y="275">病房 306</text>
+                    <text x="330" y="275">库房</text><text x="485" y="275">污物间</text>
+                  </g>
+                  <!-- 楼梯间 -->
+                  <rect x="20" y="150" width="10" height="60" fill="#c8d6e6"/><rect x="610" y="150" width="10" height="60" fill="#c8d6e6"/>
+                  <!-- 风险区：配药室（红） -->
+                  <g id="L-risk">
+                    <polygon points="440,20 620,20 620,150 440,150" fill="rgba(214,69,65,.15)" stroke="#d64541" stroke-dasharray="6 4" stroke-width="2"/>
+                    <text x="468" y="42" font-size="11" fill="#d64541" font-weight="bold">🔴 风险区·配药室（红）</text>
+                    <!-- 风险区：库房（橙） -->
+                    <polygon points="300,210 440,210 440,340 300,340" fill="rgba(232,138,29,.15)" stroke="#e88a1d" stroke-dasharray="6 4" stroke-width="2"/>
+                    <text x="312" y="232" font-size="11" fill="#e88a1d" font-weight="bold">🟠 风险区·库房（橙）</text>
+                  </g>
+                  <!-- 灭火器点位 -->
+                  <g id="L-ext" cursor="pointer">
+                    <circle cx="180" cy="165" r="8" fill="#d64541" onclick="showPoint('MHQ-2-3F-001')"/>
+                    <circle cx="460" cy="195" r="8" fill="#d64541" onclick="showPoint('MHQ-2-3F-002')"/>
+                    <circle cx="60" cy="145" r="8" fill="#e6b800" onclick="showPoint('MHQ-2-3F-003')"/>
+                    <text x="52" y="132" font-size="9" fill="#a08800">临期</text>
+                  </g>
+                  <!-- 消火栓 -->
+                  <g id="L-hyd" cursor="pointer">
+                    <rect x="296" y="152" width="12" height="12" fill="#1b6fd1" onclick="showPoint('XHS-2-3F-001')"/>
+                    <rect x="120" y="206" width="12" height="12" fill="#1b6fd1" onclick="showPoint('XHS-2-3F-002')"/>
+                  </g>
+                  <!-- 逃生出口 -->
+                  <g id="L-exit">
+                    <rect x="22" y="168" width="16" height="24" fill="#2ba471" rx="2"/><text x="12" y="162" font-size="9" fill="#2ba471">出口1</text>
+                    <rect x="602" y="168" width="16" height="24" fill="#2ba471" rx="2"/><text x="592" y="162" font-size="9" fill="#2ba471">出口2</text>
+                  </g>
+                  <!-- 重点电器 -->
+                  <g id="L-elec" cursor="pointer">
+                    <path d="M350 260 l7 -14 l7 14 z" fill="#e88a1d" onclick="showPoint('DQ-2-3F-001')"/>
+                    <text x="330" y="258" font-size="9" fill="#e88a1d">大功率电器</text>
+                  </g>
+                  <!-- 告警演示点（二期） -->
+                  <circle cx="180" cy="165" r="13" fill="none" stroke="#d64541" stroke-width="1.5" opacity=".6">
+                    <animate attributeName="r" values="10;18" dur="1.5s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values=".7;0" dur="1.5s" repeatCount="indefinite"/>
+                  </circle>
+                  <text x="150" y="150" font-size="10" fill="#d64541">⚡ 告警演示（二期设备联动效果）</text>
+                </svg>
+                <div class="plan-legend">
+                  <span onclick="toggleLayer('L-ext',this)"><i style="background:#d64541"></i>灭火器(3)</span>
+                  <span onclick="toggleLayer('L-hyd',this)"><i style="background:#1b6fd1;border-radius:2px"></i>消火栓(2)</span>
+                  <span onclick="toggleLayer('L-exit',this)"><i style="background:#2ba471;border-radius:2px"></i>逃生出口(2)</span>
+                  <span onclick="toggleLayer('L-risk',this)"><i style="background:#e88a1d;border-radius:2px"></i>风险区(2)</span>
+                  <span onclick="toggleLayer('L-elec',this)"><i style="background:#e88a1d;border-radius:50%"></i>重点电器(1)</span>
+                  <span style="margin-left:auto;color:var(--text2)">点击图上点位 → 右侧查看档案</span>
+                </div>
+              </div>
+              <div style="width:260px;">
+                <div class="card" style="margin:0;height:100%" id="pointCard">
+                  <h3><span class="dot"></span>点位档案</h3>
+                  <div id="pointInfo" style="font-size:13px;line-height:2;color:var(--text2)">← 点击平面图上的点位查看档案详情</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 合规体检 -->
+    <div class="page" id="p-assess">
+      <h2 class="pt">合规体检报告</h2><div class="pt-sub">大脑静态体检 · 按「建成年代 + 适用标准版本」分别判定 · 2026 年度快照
+        <button class="btn sm" style="float:right" onclick="toast('已导出《2026 年度安全合规体检报告》Word 版')">📄 导出报告</button></div>
+      <div class="grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat"><div class="l">检查项总数</div><div class="n">1,286</div><div class="l">覆盖 11 类档案</div></div>
+        <div class="stat"><div class="l">✅ 达标</div><div class="n" style="color:var(--green)">1,102</div><div class="l">85.7%</div></div>
+        <div class="stat"><div class="l">⚠️ 新旧标准差异项</div><div class="n" style="color:var(--orange)">167</div><div class="l">老楼按建成年代合规、按新标不合规</div></div>
+        <div class="stat"><div class="l">❌ 不达标（违反通用规范底线）</div><div class="n" style="color:var(--red)">17</div><div class="l">任何楼宇均须满足</div></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h3><span class="dot"></span>问题明细（按楼宇 / 按标准层级）</h3>
+        <table class="tb">
+          <tr><th>楼宇</th><th>问题项</th><th>依据条款</th><th>结论</th><th>医院决策</th><th>操作</th></tr>
+          <tr><td>2 号楼<span class="tag yellow" style="margin-left:4px">1998</span></td><td>疏散楼梯净宽 1.05m＜1.1m</td><td class="mono">GB50016-2014 §5.5.18（现行）</td><td><span class="tag orange">差异项</span></td>
+            <td><select style="padding:4px 8px;border:1px solid var(--line);border-radius:5px;font-size:12.5px" onchange="toast('决策已记录并留痕')"><option>待决策</option><option>拟整改</option><option>过渡期措施</option><option selected>维持现状（附决议）</option></select></td>
+            <td><button class="btn sm" onclick="toast('已上传院长办公会决议扫描件')">附决议</button></td></tr>
+          <tr><td>2 号楼</td><td>3F 疏散通道 3 次被占用（动态数据）</td><td class="mono">GB 55037-2022 §7.1.5（通用规范）</td><td><span class="tag red">不达标</span></td>
+            <td><select style="padding:4px 8px;border:1px solid var(--line);border-radius:5px;font-size:12.5px" onchange="toast('已生成整改工单（闭环式）')"><option>待决策</option><option selected>拟整改 · 自动开工单</option></select></td>
+            <td><button class="btn sm pri">开工单</button></td></tr>
+          <tr><td>1 号楼<span class="tag green" style="margin-left:4px">2019</span></td><td>门诊 1F 灭火器 2 具临期（15 天内）</td><td class="mono">GB 50444-2008 §5.3</td><td><span class="tag red">不达标</span></td>
+            <td><select style="padding:4px 8px;border:1px solid var(--line);border-radius:5px;font-size:12.5px"><option>待决策</option><option selected>拟整改（换药）</option></select></td>
+            <td><button class="btn sm pri">开工单</button></td></tr>
+        </table>
+        <div style="margin-top:12px;font-size:12.5px;color:var(--text2);background:#f7f9fc;padding:10px 12px;border-radius:6px">
+          💡 判定逻辑：通用规范（GB 55037/55036 全文强制）为底线，任何楼宇违反即「❌ 不达标」；专项标准现行版与建成年代版本不一致的进「⚠️ 差异项」，附过渡措施建议；知悉范围由租户在权限中自行配置。
+        </div>
+      </div>
+    </div>
+
+    <!-- 风险区自查 -->
+    <div class="page" id="p-selfcheck">
+      <h2 class="pt">风险区安全自查</h2><div class="pt-sub">风险区台账（平面图圈划联动）· 按风险等级定频次 · 安全员双线检查</div>
+      <div class="card">
+        <h3><span class="dot"></span>风险区台账</h3>
+        <table class="tb">
+          <tr><th>风险区</th><th>位置</th><th>等级</th><th>责任安全员</th><th>自查频次</th><th>本月完成</th><th>状态</th></tr>
+          <tr><td>配药室</td><td>2号楼3F <span style="color:var(--primary);cursor:pointer" onclick="go('archive')">📍</span></td><td><span class="tag red">红</span></td><td>药剂科·陈**</td><td>每日</td><td>4/4</td><td><span class="tag green">正常</span></td></tr>
+          <tr><td>中心氧站</td><td>后勤楼旁 <span style="color:var(--primary);cursor:pointer">📍</span></td><td><span class="tag red">红</span></td><td>总务科·刘**</td><td>每日</td><td>2/4</td><td><span class="tag red">逾期 2h · 已升级科长</span></td></tr>
+          <tr><td>病区库房</td><td>2号楼3F <span style="color:var(--primary);cursor:pointer">📍</span></td><td><span class="tag orange">橙</span></td><td>内科·李**</td><td>每周</td><td>1/1</td><td><span class="tag green">正常</span></td></tr>
+          <tr><td>食堂燃气间</td><td>后勤楼1F</td><td><span class="tag orange">橙</span></td><td>膳食科·赵**</td><td>每日</td><td>4/4</td><td><span class="tag green">正常</span></td></tr>
+          <tr><td>配电室</td><td>2号楼B1</td><td><span class="tag yellow">黄</span></td><td>设备科·孙**</td><td>每周</td><td>1/1</td><td><span class="tag green">正常</span></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- 安全培训 -->
+    <div class="page" id="p-train">
+      <h2 class="pt">安全培训</h2><div class="pt-sub">材料库 · 规则模板（对象×考核×查看 三轴自定义）· 学习考试台账</div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;">
+        <div class="card">
+          <h3><span class="dot"></span>培训计划
+            <button class="btn sm pri" style="margin-left:auto" onclick="toast('新建计划：选材料→套规则模板→定向下发')">+ 下发培训</button></h3>
+          <table class="tb">
+            <tr><th>计划</th><th>对象</th><th>规则</th><th>完成率</th><th>截止</th></tr>
+            <tr><td>新入职保安岗前必训</td><td>第三方·安保护卫队</td><td style="font-size:12px">4 学时+考试 80 分+补考 2 次</td><td><span style="color:var(--green)">18/20</span></td><td>10-10</td></tr>
+            <tr><td>秋季消防全员轮训</td><td>全院职工</td><td style="font-size:12px">仅学习·无考试</td><td>342/589</td><td>10-31</td></tr>
+            <tr><td>动火作业专项</td><td>施工方+设备科</td><td style="font-size:12px">2 学时+考试 90 分</td><td>9/12</td><td>10-15</td></tr>
+          </table>
+          <div style="margin-top:10px;font-size:12.5px;color:var(--text2)">⏰ 临期未学自动催办 → 逾期升级科长 · 完成率已纳入第三方履约考核</div>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>规则模板配置（示例：新入职保安岗前必训）</h3>
+          <div class="kv" style="grid-template-columns:100px 1fr;">
+            <span class="k">面向对象</span><span>角色=保安队员 且 单位=第三方 · 新入职 30 天内</span>
+            <span class="k">考核规则</span><span>学时 ≥4h；须考试；合格线 80 分；补考 ≤2 次；入职 30 天内完成</span>
+            <span class="k">查看规则</span><span>仅本院人员可见；视频防下载；进度防拖（播完才算）</span>
+          </div>
+          <div style="margin-top:12px;padding:10px;background:#f7f9fc;border-radius:6px;font-size:12.5px;color:var(--text2)">
+            💡 三轴自由组合，模板可保存复用。例：医护=仅阅读；施工=考试 90 分；管理岗=学时+书面心得。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 危险作业票 -->
+    <div class="page" id="p-permit">
+      <h2 class="pt">危险作业票</h2><div class="pt-sub">动火先行 · 票种模板可配置（临时用电/高处/受限空间扩展不改代码）· 全部可导出打印线下签字</div>
+      <div class="grid" style="grid-template-columns:1.2fr 1fr;">
+        <div class="card">
+          <h3><span class="dot"></span>动火作业票 · DH20261004003
+            <span style="margin-left:auto;display:flex;gap:8px;">
+              <button class="btn sm" onclick="toast('已导出《动火安全作业票》PDF，打印后线下签字归档')">📄 导出作业票</button>
+            </span></h3>
+          <div class="kv" style="grid-template-columns:100px 1fr 90px 1fr;">
+            <span class="k">施工单位</span><span>**燃气工程公司（第三方）</span><span class="k">作业内容</span><span>食堂燃气管道焊接维修</span>
+            <span class="k">作业地点</span><span>后勤楼 1F 燃气间 <span style="color:var(--primary);cursor:pointer">📍</span></span><span class="k">作业时间</span><span>10-05 08:00~17:00</span>
+            <span class="k">作业人员</span><span>张**(焊工证✓) 李**(证✓)</span><span class="k">监火人</span><span>安保科 王班长</span>
+          </div>
+          <h3 style="margin-top:14px"><span class="dot"></span>审批链</h3>
+          <div class="approval-chain">
+            <div class="ap-node done"><div class="circle">✓</div><div class="nm">施工方申请</div></div><div class="ap-arrow"></div>
+            <div class="ap-node done"><div class="circle">✓</div><div class="nm">设备科审核</div></div><div class="ap-arrow"></div>
+            <div class="ap-node cur"><div class="circle">●</div><div class="nm">安保科审批</div></div><div class="ap-arrow"></div>
+            <div class="ap-node"><div class="circle">3</div><div class="nm">分管院长批准</div></div>
+          </div>
+          <h3 style="margin-top:14px"><span class="dot"></span>安全措施清单（逐项勾选）</h3>
+          <div style="font-size:13px;line-height:2.2">
+            ☑ 作业点 10m 内可燃物已清除 &nbsp; ☑ 配备灭火器 2 具 &nbsp; ☑ 燃气阀门已关闭并挂牌 &nbsp; ☐ 作业后留守观察 30 分钟
+          </div>
+          <div style="margin-top:12px;display:flex;gap:10px;">
+            <button class="btn pri" onclick="toast('审批通过，流转至分管院长；微信已通知')">审批通过</button>
+            <button class="btn danger" onclick="toast('已驳回并注明原因')">驳回</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>🧠 大脑联动核查</h3>
+          <div class="brain-box">
+            <div class="bh">审批前置校验 · 自动执行</div>
+            <div class="warn-line">✅ <div>作业人员焊工证均在有效期内（核对档案：人员资质库）</div></div>
+            <div class="warn-line">⚠️ <div><b>作业点 50m 范围内灭火器 4 具，其中 1 具 7 天内到期</b><div style="font-size:12px;color:var(--text2)">建议：作业前先行更换，已一键生成换药工单</div></div></div>
+            <div class="warn-line">✅ <div>燃气间风险区自查记录正常（近 7 日无异常）</div></div>
+            <div class="warn-line">⚠️ <div><b>冲突提示：10-05 上午该区域有消防维保计划</b><div style="font-size:12px;color:var(--text2)">建议调整作业时段至下午</div></div></div>
+          </div>
+          <div style="margin-top:12px;font-size:12.5px;color:var(--text2);line-height:1.8">
+            联动核查数据源：摸底档案（点位/风险区）+ 人员资质库 + 业务计划。这就是「摸底数据反哺业务」的典型场景。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 特种设备安全管理 -->
+    <div class="page" id="p-equip">
+      <h2 class="pt">特种设备安全管理</h2><div class="pt-sub">一机一档 · 检验 / 维保 / 持证全周期 · 依据《特种设备安全法》·TSG 08《使用管理规则》·TSG T5002（电梯每 15 日维保一次）· 纯软件实现，二期可扩物联监测</div>
+      <div class="grid" style="grid-template-columns:repeat(5,1fr);">
+        <div class="stat"><div class="l">设备总数</div><div class="n">86</div><div class="l">6 大类 · 电梯 41 台</div></div>
+        <div class="stat"><div class="l">30 日内到期检验</div><div class="n" style="color:var(--orange)">5</div><div class="l">已自动生成报检工单</div></div>
+        <div class="stat"><div class="l">超期未检</div><div class="n" style="color:var(--red)">1</div><div class="l">⚠️ 已升级分管院长</div></div>
+        <div class="stat"><div class="l">本月维保完成率</div><div class="n" style="color:var(--green)">100%</div><div class="l">82 / 82 台次</div></div>
+        <div class="stat"><div class="l">证书 60 日内到期</div><div class="n" style="color:var(--orange)">3</div><div class="l">已联动培训复审</div></div>
+      </div>
+      <div class="pill-tab">
+        <button class="on" onclick="tabBtn(this)">全部</button><button onclick="tabBtn(this)">电梯 41</button><button onclick="tabBtn(this)">压力容器 28</button><button onclick="tabBtn(this)">压力管道 9</button><button onclick="tabBtn(this)">锅炉 3</button><button onclick="tabBtn(this)">其他 5</button>
+      </div>
+      <div class="grid" style="grid-template-columns:1.45fr 1fr;margin-top:0;">
+        <div class="card">
+          <h3><span class="dot"></span>设备台账（一机一档）
+            <span style="margin-left:auto;display:flex;gap:8px;">
+              <button class="btn sm" onclick="toast('已导出《特种设备台账》Excel，含全部检验到期日')">📊 导出台账</button>
+            </span></h3>
+          <table class="tb">
+            <tr><th>设备编号</th><th>名称</th><th>类别</th><th>安装位置</th><th>下次检验</th><th>维保</th><th>状态</th></tr>
+            <tr style="cursor:pointer;background:#f6fdfa" onclick="toast('已在下方展开 EQ-DT-012 一机一档详情')"><td class="mono">EQ-DT-012</td><td><b>医用电梯 3#</b></td><td>电梯</td><td>住院部 1F 大厅 <span style="color:var(--primary)">📍</span></td><td>2026-11-20 <span class="tag orange">29天</span></td><td>每15日·正常</td><td><span class="tag green">在用</span></td></tr>
+            <tr><td class="mono">EQ-BL-001</td><td>燃气蒸汽锅炉</td><td>锅炉</td><td>后勤楼 1F 锅炉房 📍</td><td>2026-10-10 <span class="tag red">2天</span></td><td>月度·正常</td><td><span class="tag green">在用</span></td></tr>
+            <tr><td class="mono">EQ-PV-009</td><td><b>医用高压氧舱</b></td><td>压力容器</td><td>氧疗中心 📍</td><td><b style="color:var(--red)">2026-09-30</b> <span class="tag red">超期8天</span></td><td>月度·正常</td><td><span class="tag red">停用待检</span></td></tr>
+            <tr><td class="mono">EQ-PP-002</td><td>医用氧气管道</td><td>压力管道</td><td>全院主管廊</td><td>2026-10-25 <span class="tag orange">17天</span></td><td>季度·正常</td><td><span class="tag green">在用</span></td></tr>
+            <tr><td class="mono">EQ-PV-004</td><td>脉动真空灭菌器</td><td>压力容器</td><td>消毒供应中心</td><td>2027-03-12</td><td>月度·正常</td><td><span class="tag green">在用</span></td></tr>
+            <tr><td class="mono">EQ-OT-001</td><td>液氧储罐 5m³</td><td>压力容器</td><td>液氧站 📍</td><td>2027-01-08</td><td>月度·正常</td><td><span class="tag green">在用</span></td></tr>
+            <tr><td class="mono">EQ-DT-031</td><td>自动扶梯</td><td>电梯</td><td>门诊 1F 中庭</td><td>2027-02-15</td><td>每15日·正常</td><td><span class="tag green">在用</span></td></tr>
+          </table>
+          <div style="margin-top:10px;font-size:12.5px;color:var(--text2)">📍 = 已关联摸底档案点位，可在楼层平面图定位；点击任意设备行可查看一机一档（下方以 EQ-DT-012 为例）</div>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>🧠 大脑实时监测</h3>
+          <div class="brain-box">
+            <div class="bh">特种设备规则 · 今日触发 6 条</div>
+            <div class="warn-line">🔴 <div><b>EQ-PV-009 医用高压氧舱超期未检 8 天</b><div style="font-size:12px;color:var(--text2)">闭环式 · 已自动开报检工单并升级分管院长 · 依据 TSG 21 定检周期</div></div></div>
+            <div class="warn-line">🟠 <div><b>3 台电梯限速器校验 30 日内到期</b><div style="font-size:12px;color:var(--text2)">限速器每 2 年校验 · 已派单维保单位，限 7 日内完成</div></div></div>
+            <div class="warn-line">🟠 <div><b>作业人员证书 3 本 60 日内到期</b>（R1 压力容器×2 / T 电梯修理×1）<div style="font-size:12px;color:var(--text2)">已联动培训模块下发复审学习任务，逾期未考将拦截作业派工</div></div></div>
+            <div class="warn-line">✅ <div>本月电梯 15 日维保 82 台次全部按期完成，维保单位履约 100%</div></div>
+            <div class="warn-line">📋 <div><b>周期已内置</b>：锅炉外部检验 1 年 / 内部 2 年 / 水压 6 年；压力容器按安全状况等级 3~6 年；压力表 6 个月；安全阀 1 年<div style="font-size:12px;color:var(--text2)">系统按类别自动推算下次检验日，无需人工记忆</div></div></div>
+          </div>
+          <div style="margin-top:12px;font-size:12.5px;color:var(--text2);line-height:1.8">
+            这就是"人脑装不下的法规"变成系统能力的典型：各类设备检验周期、维保频次、证书有效期，全部由大脑按规则自动盯。
+          </div>
+        </div>
+      </div>
+      <div class="grid" style="grid-template-columns:1.45fr 1fr;">
+        <div class="card">
+          <h3><span class="dot"></span>EQ-DT-012 医用电梯 3# · 一机一档
+            <span style="margin-left:auto;display:flex;gap:8px;">
+              <button class="btn sm" onclick="toast('已导出该设备完整档案（出厂资料+登记证+历次检验报告+维保记录+故障记录）PDF，可打印归档')">📄 导出设备档案</button>
+              <button class="btn sm pri" onclick="toast('已生成报检工单，派单设备科，限时 15 日内完成')">开报检工单</button>
+            </span></h3>
+          <div class="kv" style="grid-template-columns:100px 1fr 100px 1fr;">
+            <span class="k">设备代码</span><span class="mono">3110…（21位）</span><span class="k">制造单位</span><span>**电梯有限公司</span>
+            <span class="k">型号</span><span>医用病床梯 1600kg</span><span class="k">投用日期</span><span>2019-06-18</span>
+            <span class="k">登记证号</span><span>容登 …0892</span><span class="k">登记机关</span><span>市市场监督管理局</span>
+            <span class="k">安装位置</span><span>住院部 1F 大厅 <span style="color:var(--primary);cursor:pointer" onclick="go('archive')">📍平面图定位</span></span><span class="k">责任人</span><span>设备科 陈工 / 安保科 王班长</span>
+            <span class="k">维保单位</span><span>**电梯维保公司（第三方）</span><span class="k">24h电话</span><span>138****2210</span>
+          </div>
+          <h3 style="margin-top:14px"><span class="dot"></span>三个法定时限倒计时</h3>
+          <div style="font-size:13px;line-height:2.4">
+            <div>📅 <b>下次定期检验</b> 2026-11-20　<span class="tag orange">剩余 29 天</span>　<span style="color:var(--text2)">电梯每年一次</span></div>
+            <div>🔧 <b>下次维保</b> 2026-10-12　<span class="tag blue">剩余 4 天</span>　<span style="color:var(--text2)">每 15 日一次（TSG T5002）</span></div>
+            <div>👤 <b>作业人员证（T）</b> 有效期至 2027-05-30　<span class="tag green">有效</span></div>
+          </div>
+          <h3 style="margin-top:14px"><span class="dot"></span>档案文件（一键成档）</h3>
+          <div style="font-size:13px;line-height:2.1;color:var(--text)">
+            ✅ 出厂合格证 &nbsp; ✅ 制造监督检验证书 &nbsp; ✅ 安装验收报告 &nbsp; ✅ 定期检验报告 ×5（2019~2025）<br>
+            ✅ 维保记录 82 条 &nbsp; ✅ 修理改造记录 2 条 &nbsp; ⚠️ 故障/困人记录 3 条 &nbsp; ✅ 使用登记证扫描件
+          </div>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>近期故障与应急（关联场景处置卡）</h3>
+          <div class="tl">
+            <div class="ti done"><div class="tt">2026-09-12 14:22 电梯困人 2 人</div><div class="td">大脑匹配处置卡 <b>SC-010 电梯困人</b> 推送现场 · 消控室通知维保<br>维保 <b style="color:var(--green)">22 分钟到场</b>（设区市要求 ≤30 分钟 ✓ 达标）· 14:51 救出无伤亡<br>复盘：轿厢应急照明正常，已纳入季度演练脚本</div></div>
+            <div class="ti done"><div class="tt">2026-08-03 灭菌器压力表异常</div><div class="td">日常自行检查发现 → 转隐患工单 → 更换压力表并校验 → 已闭环</div></div>
+            <div class="ti cur"><div class="tt">2026-10-08 氧舱超期未检</div><div class="td">已停用挂牌 · 报检工单执行中 · 超时将升级分管院长</div></div>
+          </div>
+          <div style="margin-top:8px;font-size:12.5px;color:var(--text2);line-height:1.8">
+            故障登记自动关联场景处置卡（C11），救援到场时间自动计时并计入维保单位履约考核——超时即升级。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 安全运行报告 -->
+    <div class="page" id="p-report">
+      <h2 class="pt">安全运行报告</h2><div class="pt-sub">周 / 月 / 季 / 年 + 自定义时间段 · 全院安全板块运行数据自动归集 · 大脑生成研判建议 · 一键导出报送院领导</div>
+      <div class="card">
+        <div class="pill-tab" style="margin-bottom:10px">
+          <button onclick="tabBtn(this);rptRange('周报')">周报</button>
+          <button class="on" onclick="tabBtn(this);rptRange('月报')">月报</button>
+          <button onclick="tabBtn(this);rptRange('季报')">季报</button>
+          <button onclick="tabBtn(this);rptRange('年报')">年报</button>
+          <button onclick="tabBtn(this);rptRange('自定义')">自定义时间段</button>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+          <span style="font-size:13px;color:var(--text2)">统计范围</span>
+          <span class="mono" id="rptRangeTxt">2026-09-01 ~ 2026-09-30</span>
+          <button class="btn sm" onclick="toast('范围筛选：已切换为 全院区（可按院区/楼宇/科室筛选）')">全院区 ▾</button>
+          <button class="btn sm" onclick="toast('章节模板：默认《月度安全运行报告》12 章节（可后台增删排序）')">📑 章节模板 ▾</button>
+          <span style="margin-left:auto;display:flex;gap:8px;">
+            <button class="btn sm" onclick="toast('已按当前时间段重新归集数据并生成草稿')">🔄 重新归集</button>
+            <button class="btn sm pri" onclick="toast('报告已生成：自动取数 + 大脑研判成文，待科长审核')">生成报告</button>
+          </span>
+        </div>
+        <div id="rptCustom" style="display:none;margin-top:10px;padding:10px 12px;background:#f7f9fc;border-radius:6px;font-size:13px;">
+          自定义起止日期：<input type="date" value="2026-10-01" style="padding:5px 8px;border:1px solid var(--line);border-radius:6px;"> ~
+          <input type="date" value="2026-10-07" style="padding:5px 8px;border:1px solid var(--line);border-radius:6px;">
+          <button class="btn sm pri" style="margin-left:8px" onclick="toast('已按 10-01~10-07 生成《国庆假期安全运行专项报告》')">生成专项报告</button>
+          <span style="color:var(--text2);font-size:12.5px;margin-left:8px">适用于迎检区间、台风周、重大活动等任意时段</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="dot"></span>《2026 年 9 月 医院安全运行报告》<span style="margin-left:auto;font-size:12.5px;color:var(--text2)">状态：待科长审核 · v1 草稿 · 数据源：7 个业务模块 + 摸底档案 + 大脑体检</span></h3>
+        <div class="grid" style="grid-template-columns:repeat(6,1fr);">
+          <div class="stat" style="padding:12px 14px"><div class="l">隐患上报</div><div class="n" style="font-size:22px">268</div><div class="l">环比 +12</div></div>
+          <div class="stat" style="padding:12px 14px"><div class="l">按期整改率</div><div class="n" style="font-size:22px;color:var(--green)">93.2%</div><div class="l">环比 +1.8%</div></div>
+          <div class="stat" style="padding:12px 14px"><div class="l">巡查完成率</div><div class="n" style="font-size:22px;color:var(--green)">96.4%</div><div class="l">1490/1545</div></div>
+          <div class="stat" style="padding:12px 14px"><div class="l">风险区自查率</div><div class="n" style="font-size:22px">98.1%</div><div class="l">环比 +3.4%</div></div>
+          <div class="stat" style="padding:12px 14px"><div class="l">培训合格率</div><div class="n" style="font-size:22px">91.0%</div><div class="l">589 人参考</div></div>
+          <div class="stat" style="padding:12px 14px"><div class="l">作业票 / 设备临期</div><div class="n" style="font-size:22px;color:var(--orange)">18 / 5</div><div class="l">动火票 / 台</div></div>
+        </div>
+      </div>
+      <div class="grid" style="grid-template-columns:1.45fr 1fr;">
+        <div class="card">
+          <h3><span class="dot"></span>🧠 大脑研判与工作建议（AI 成文 · 科长可编辑）</h3>
+          <div class="brain-box">
+            <div class="bh">基于本期 1545 条巡查、268 条隐患、589 份培训档案自动生成</div>
+            <div style="font-size:13px;line-height:1.9;background:#fff;border-radius:6px;padding:12px 14px;border:1px solid #f0e2d0;">
+              1. <b>态势</b>：本月安全形势总体平稳，隐患按期整改率 93.2%（环比 +1.8%），无较大及以上事件。<br>
+              2. <b>异常点</b>：疏散通道占用类隐患 41 起，其中 <b>住院部 3F 占 12 起（29%）</b>，为近三月持续高发点位；第三方保安巡查漏点 55 次，集中在夜班 02:00~05:00 时段。<br>
+              3. <b>归因</b>：3F 病区加床导致通道被占用；夜班漏点与人员配置不足相关。<br>
+              4. <b>建议</b>：① 住院部 3F 增设每日 2 次专项巡查并纳入科室考核；② 与医务科协商加床上限；③ 第三方保安夜班增派 1 人，纳入履约考核整改项；④ 下月组织一次疏散通道专项清理。<br>
+              5. <b>风险提示</b>：医用高压氧舱已于 09-30 超期未检，属红色风险，建议本月内完成报检。
+            </div>
+            <div style="margin-top:8px;font-size:12.5px;color:var(--text2)">⚠️ AI 只成文不决策：科长可修改后发布，发布即锁定版本、快照留存</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>📱 院领导小程序视图（只读）</h3>
+          <div style="border:8px solid #1a1d23;border-radius:20px;padding:10px;background:#f5f7fa;">
+            <div style="background:linear-gradient(135deg,#123f7b,#1b6fd1);color:#fff;border-radius:10px;padding:10px 12px;font-size:12.5px;">9 月安全运行摘要 <span style="opacity:.8;font-size:11px">· 张院长</span></div>
+            <div class="mcard" style="margin-top:8px;font-size:12.5px"><b>总体平稳</b>　<span style="color:var(--green)">整改率 93.2% ↑</span><br><span style="color:var(--text2)">无较大及以上安全事件</span></div>
+            <div class="mcard" style="font-size:12.5px">🔴 需关注 1 项：医用高压氧舱超期未检<br>🟠 高发点位：住院部 3F 通道占用</div>
+            <div class="mcard" style="font-size:12.5px">巡查 96.4% · 自查 98.1% · 培训合格 91%<br>动火作业票 18 张 · 应急事件 2 起</div>
+            <div style="font-size:12px;color:var(--text2);padding:6px 2px">📄 查看完整报告　📊 同比对比　⬇ 下载 PDF</div>
+          </div>
+          <div style="margin-top:10px;font-size:12.5px;color:var(--text2);line-height:1.8">可见范围由使用方自行配置（贯彻"报告给谁看由医院决定"）</div>
+        </div>
+      </div>
+      <div class="grid" style="grid-template-columns:1.45fr 1fr;">
+        <div class="card">
+          <h3><span class="dot"></span>报告章节（12 章 · 自动归集，可下钻到原始单据）</h3>
+          <table class="tb">
+            <tr><th>章节</th><th>数据来源模块</th><th>本期要点</th><th>归集</th></tr>
+            <tr><td>一、安全态势总览</td><td>全部模块 + 大脑体检</td><td>无较大事件；红色风险 1 项</td><td><span class="tag green">自动</span></td></tr>
+            <tr><td>二、隐患排查治理</td><td>隐患闭环 D</td><td>上报 268 / 闭环 250 / 整改率 93.2%</td><td><span class="tag green">自动</span></td></tr>
+            <tr><td>三、巡查与自查</td><td>巡查 E + 自查 F</td><td>巡查 1545 次；自查率 98.1%</td><td><span class="tag green">自动</span></td></tr>
+            <tr><td>四、安全培训</td><td>培训 G</td><td>下发 6 期；参考 589 人；合格 91%</td><td><span class="tag green">自动</span></td></tr>
+            <tr><td>五、危险作业</td><td>作业票 H</td><td>动火 18 张；违规 0；全部销票</td><td><span class="tag green">自动</span></td></tr>
+            <tr><td>六、特种设备</td><td>特种设备 P</td><td>86 台；检验 5 台临期、1 台超期；维保 100%</td><td><span class="tag green">自动</span></td></tr>
+            <tr><td>七、应急与事件</td><td>应急 K / 处置卡 C11</td><td>事件 2 起；平均到场 3 分 12 秒</td><td><span class="tag green">自动</span></td></tr>
+            <tr><td>八、第三方履约</td><td>考核 M2</td><td>保安公司 A：及时率 94.2%；维保 B：100%</td><td><span class="tag green">自动</span></td></tr>
+            <tr><td>九、科室排名</td><td>考核 M3</td><td>前 3：药剂科/设备科/后勤；末位：骨科 3F</td><td><span class="tag green">自动</span></td></tr>
+            <tr><td>十、风险区状态</td><td>摸底 B + 自查 F</td><td>红色 2 区、橙色 7 区；责任人变更 1 处</td><td><span class="tag green">自动</span></td></tr>
+            <tr><td>十一、下期重点工作</td><td>大脑研判</td><td>通道专项清理 + 夜班增派 + 氧舱报检</td><td><span class="tag blue">AI 建议</span></td></tr>
+            <tr><td>十二、纸质存档材料</td><td>单据中心 A8</td><td>年检单 3 份、签字整改单 12 份（扫描件）</td><td><span class="tag orange">补录</span></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>科室安全排名（可下钻）</h3>
+          <table class="tb">
+            <tr><th>排名</th><th>科室</th><th>自查率</th><th>整改及时率</th><th>得分</th></tr>
+            <tr><td>🥇 1</td><td>药剂科</td><td>100%</td><td>100%</td><td>98</td></tr>
+            <tr><td>🥈 2</td><td>设备科</td><td>100%</td><td>96%</td><td>96</td></tr>
+            <tr><td>🥉 3</td><td>后勤保障部</td><td>96%</td><td>98%</td><td>94</td></tr>
+            <tr><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td></tr>
+            <tr style="background:#fdeceb"><td>18</td><td>骨科（3F 病区）</td><td>82%</td><td>76%</td><td style="color:var(--red)">71</td></tr>
+          </table>
+          <h3 style="margin-top:14px"><span class="dot"></span>发布与存档</h3>
+          <div class="approval-chain" style="margin:6px 0 12px;">
+            <div class="ap-node done"><div class="circle">✓</div><div class="nm">系统归集</div></div><div class="ap-arrow"></div>
+            <div class="ap-node cur"><div class="circle">●</div><div class="nm">科长审核</div></div><div class="ap-arrow"></div>
+            <div class="ap-node"><div class="circle">3</div><div class="nm">院长签批</div></div><div class="ap-arrow"></div>
+            <div class="ap-node"><div class="circle">4</div><div class="nm">发布归档</div></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn pri" onclick="toast('审核通过，已推送院长签批；微信摘要卡片已发送')">审核通过</button>
+            <button class="btn" onclick="toast('已导出 Word 版报告（可编辑）')">📄 导出 Word</button>
+            <button class="btn" onclick="toast('已导出 PDF 版报告，打印后线下签字纸质存档（双轨制）')">🖨 导出 PDF 签字存档</button>
+            <button class="btn" onclick="toast('已查看历年同期对比：本月 vs 上月、本季 vs 去年同季')">📊 同期对比</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 科内任务管理 -->
+    <div class="page" id="p-task">
+      <h2 class="pt">科内任务管理</h2><div class="pt-sub">科长派单跟踪 · 科员执行反馈与自添 · 统一待办聚合 —— 打开系统就看到自己要执行、要监管的全部事项</div>
+      <div class="grid" style="grid-template-columns:repeat(5,1fr);">
+        <div class="stat"><div class="l">全科进行中</div><div class="n">18</div><div class="l">本周新增 7</div></div>
+        <div class="stat"><div class="l">今日到期</div><div class="n" style="color:var(--orange)">5</div><div class="l">含 2 项业务待办</div></div>
+        <div class="stat"><div class="l">已逾期</div><div class="n" style="color:var(--red)">3</div><div class="l">最长逾期 2 天</div></div>
+        <div class="stat"><div class="l">待我验收</div><div class="n">4</div><div class="l">堆积提醒已推送</div></div>
+        <div class="stat"><div class="l">本周完成率</div><div class="n" style="color:var(--green)">87%</div><div class="l">环比 +5%</div></div>
+      </div>
+      <div class="pill-tab">
+        <button class="on" onclick="tabBtn(this);taskView('board')">科务看板（科长）</button>
+        <button onclick="tabBtn(this);taskView('mine')">我的事项（科员）</button>
+        <button onclick="tabBtn(this);taskView('recur')">周期任务</button>
+      </div>
+
+      <div id="tv-board">
+        <div class="grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="card">
+            <h3><span class="dot"></span>王科员 <span class="tag gray">3 项 · 负荷高</span></h3>
+            <div style="border:1px solid var(--line);border-radius:6px;padding:10px;margin-bottom:8px;border-left:3px solid var(--red)">
+              <div style="font-size:13px;font-weight:600">月度安全隐患分析报告</div>
+              <div style="font-size:12px;color:var(--red);margin:4px 0">截止 10-05 · <b>逾期 2 天</b></div>
+              <div style="background:#eef1f5;border-radius:4px;height:6px;"><div style="width:80%;background:var(--orange);height:6px;border-radius:4px;"></div></div>
+              <div style="font-size:11.5px;color:var(--text2);margin-top:4px">进度 80%</div>
+            </div>
+            <div style="border:1px solid var(--line);border-radius:6px;padding:10px;margin-bottom:8px;border-left:3px solid var(--orange)">
+              <div style="font-size:13px;font-weight:600">迎检材料整理（三甲评审）</div>
+              <div style="font-size:12px;color:var(--orange);margin:4px 0">截止 10-12 · 剩 3 天</div>
+              <div style="background:#eef1f5;border-radius:4px;height:6px;"><div style="width:60%;background:var(--primary);height:6px;border-radius:4px;"></div></div>
+              <div style="font-size:11.5px;color:var(--text2);margin-top:4px">进度 60% · 关联评审条款 12 条</div>
+            </div>
+            <div style="border:1px solid var(--line);border-radius:6px;padding:10px;border-left:3px solid var(--primary)">
+              <div style="font-size:13px;font-weight:600">第三季度消防演练组织</div>
+              <div style="font-size:12px;color:var(--text2);margin:4px 0">截止 10-20</div>
+              <div style="background:#eef1f5;border-radius:4px;height:6px;"><div style="width:20%;background:var(--primary);height:6px;border-radius:4px;"></div></div>
+              <div style="font-size:11.5px;color:var(--text2);margin-top:4px">进度 20%</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3><span class="dot"></span>李科员 <span class="tag gray">2 项</span></h3>
+            <div style="border:1px solid var(--line);border-radius:6px;padding:10px;margin-bottom:8px;border-left:3px solid var(--primary)">
+              <div style="font-size:13px;font-weight:600">电梯困人处置卡复盘修订</div>
+              <div style="font-size:12px;color:var(--text2);margin:4px 0">截止 10-10 · 剩 2 天</div>
+              <div style="background:#eef1f5;border-radius:4px;height:6px;"><div style="width:40%;background:var(--primary);height:6px;border-radius:4px;"></div></div>
+              <div style="font-size:11.5px;color:var(--text2);margin-top:4px">进度 40% · 关联处置卡 SC-010</div>
+            </div>
+            <div style="border:1px solid var(--line);border-radius:6px;padding:10px;border-left:3px solid var(--primary)">
+              <div style="font-size:13px;font-weight:600">新入职保安岗前培训组织</div>
+              <div style="font-size:12px;color:var(--text2);margin:4px 0">截止 10-15</div>
+              <div style="background:#eef1f5;border-radius:4px;height:6px;"><div style="width:0%;background:var(--primary);height:6px;border-radius:4px;"></div></div>
+              <div style="font-size:11.5px;color:var(--text2);margin-top:4px">未开始</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3><span class="dot"></span>张班长 <span class="tag gray">2 项</span></h3>
+            <div style="border:1px solid var(--line);border-radius:6px;padding:10px;margin-bottom:8px;border-left:3px solid var(--orange)">
+              <div style="font-size:13px;font-weight:600">户外广告牌加固核查</div>
+              <div style="font-size:12px;color:var(--orange);margin:4px 0">截止 10-09 · 剩 1 天</div>
+              <div style="background:#eef1f5;border-radius:4px;height:6px;"><div style="width:50%;background:var(--primary);height:6px;border-radius:4px;"></div></div>
+              <div style="font-size:11.5px;color:var(--text2);margin-top:4px">进度 50% · 来自防台风部署单</div>
+            </div>
+            <div style="border:1px solid var(--line);border-radius:6px;padding:10px;opacity:.6;border-left:3px solid var(--green)">
+              <div style="font-size:13px;font-weight:600">国庆期间值守排班 <span class="tag green">已完成</span></div>
+              <div style="font-size:12px;color:var(--text2);margin:4px 0">09-30 完成 · 科长已验收 98 分</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3><span class="dot"></span>赵安全员 <span class="tag gray">1 项</span></h3>
+            <div style="border:1px solid var(--line);border-radius:6px;padding:10px;border-left:3px solid var(--red)">
+              <div style="font-size:13px;font-weight:600">药剂科风险区自查督导</div>
+              <div style="font-size:12px;color:var(--red);margin:4px 0">截止今日 10-08</div>
+              <div style="background:#eef1f5;border-radius:4px;height:6px;"><div style="width:90%;background:var(--green);height:6px;border-radius:4px;"></div></div>
+              <div style="font-size:11.5px;color:var(--text2);margin-top:4px">进度 90%</div>
+            </div>
+            <div style="margin-top:12px;padding:10px;background:#fff7f7;border-radius:6px;font-size:12.5px;color:#a32d2d;line-height:1.8">
+              🔴 <b>逾期红灯</b> 3 项：王科员×1、李科员×1、赵安全员×1<br>
+              <button class="btn sm" style="margin-top:8px" onclick="toast('已向 3 人推送催办提醒（微信+站内消息）')">一键催办逾期</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tv-mine" style="display:none">
+        <div class="card">
+          <h3><span class="dot"></span>我的事项 · 李科员 <span style="margin-left:auto;font-size:12.5px;color:var(--text2)">共 8 项：业务待办 6 + 科内任务 2 · 按截止时间排序</span></h3>
+          <table class="tb">
+            <tr><th>来源</th><th>事项</th><th>截止时间</th><th>状态</th><th>操作</th></tr>
+            <tr><td><span class="tag red">隐患工单</span></td><td>YH20261004012 住院部 3F 通道占用处置</td><td style="color:var(--red)">今日 18:00</td><td><span class="tag orange">处理中</span></td><td><button class="btn sm" onclick="toast('跳转隐患工单详情页处理（不复制数据，统一索引跳转）')">去处理</button></td></tr>
+            <tr><td><span class="tag blue">巡查任务</span></td><td>16:00-18:00 班次 · 2 个点位未巡</td><td style="color:var(--red)">今日 18:00</td><td><span class="tag gray">待执行</span></td><td><button class="btn sm" onclick="toast('跳转巡查任务页')">去巡查</button></td></tr>
+            <tr><td><span class="tag blue">风险自查</span></td><td>药剂科贵重药品库自查（今日）</td><td>今日</td><td><span class="tag gray">待执行</span></td><td><button class="btn sm" onclick="toast('跳转自查任务')">去自查</button></td></tr>
+            <tr><td><span class="tag orange">作业票审批</span></td><td>食堂燃气管道动火票 · 待你审批</td><td>4 小时内</td><td><span class="tag orange">待审批</span></td><td><button class="btn sm" onclick="go('permit')">去审批</button></td></tr>
+            <tr><td><span class="tag yellow">安全培训</span></td><td>《新入职岗前必训》考试未通过（剩 1 次补考）</td><td>10-10</td><td><span class="tag yellow">待补考</span></td><td><button class="btn sm" onclick="go('train')">去考试</button></td></tr>
+            <tr><td><span class="tag gray">维保工单</span></td><td>EQ-DT-012 医用电梯 3# 维保（15 日到期）</td><td>明日</td><td><span class="tag gray">待执行</span></td><td><button class="btn sm" onclick="go('equip')">去处理</button></td></tr>
+            <tr style="background:#f6fdfa"><td><span class="tag green">科内任务</span></td><td><b>迎检材料整理（三甲评审）</b></td><td>10-12</td><td><span class="tag green">进行中 60%</span></td><td><button class="btn sm pri" onclick="toast('打开任务详情：可更新进度/填进展/提交完成')">去执行</button></td></tr>
+            <tr style="background:#f6fdfa"><td><span class="tag green">科内任务</span></td><td><b>电梯困人处置卡复盘修订</b></td><td>10-10</td><td><span class="tag green">进行中 40%</span></td><td><button class="btn sm pri" onclick="toast('打开任务详情：可更新进度/填进展/提交完成')">去执行</button></td></tr>
+          </table>
+          <div style="margin-top:10px;font-size:12.5px;color:var(--text2);line-height:1.8">
+            💡 前 6 项是各业务模块产生的待办，经<b>统一待办中心</b>自动汇入，只存索引不复制数据，点击直接跳回原模块处理；后 2 项是科内任务。<b>新增任何模块，注册一条待办规则即可自动汇入，无需改动。</b>
+          </div>
+        </div>
+      </div>
+
+      <div id="tv-recur" style="display:none">
+        <div class="card">
+          <h3><span class="dot"></span>周期任务（自动生成，免人工派单）</h3>
+          <table class="tb">
+            <tr><th>周期</th><th>任务</th><th>默认责任人</th><th>提前生成</th><th>上次完成</th><th>状态</th></tr>
+            <tr><td>每月 5 日</td><td>上月安全隐患分析报告</td><td>王科员</td><td>提前 3 天</td><td>09-05 <span class="tag green">按时</span></td><td><span class="tag green">启用</span></td></tr>
+            <tr><td>每季度</td><td>消防演练组织</td><td>王科员</td><td>提前 15 天</td><td>07-18 <span class="tag green">按时</span></td><td><span class="tag green">启用</span></td></tr>
+            <tr><td>每周一</td><td>科务周例会材料准备</td><td>李科员</td><td>提前 1 天</td><td>10-05 <span class="tag green">按时</span></td><td><span class="tag green">启用</span></td></tr>
+            <tr><td>每月</td><td>灭火器有效期核查</td><td>张班长</td><td>提前 7 天</td><td>09-28 <span class="tag green">按时</span></td><td><span class="tag green">启用</span></td></tr>
+            <tr><td>每年</td><td>消防年检配合与整改跟踪</td><td>王科长</td><td>提前 30 天</td><td>2025-11 <span class="tag green">按时</span></td><td><span class="tag green">启用</span></td></tr>
+          </table>
+          <div style="margin-top:10px;font-size:12.5px;color:var(--text2)">周期任务到点自动生成并落入责任人待办；逾期同样进红灯与催办。</div>
+        </div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1.45fr 1fr;">
+        <div class="card">
+          <h3><span class="dot"></span>任务详情 · 迎检材料整理（三甲评审）
+            <span style="margin-left:auto;display:flex;gap:8px;">
+              <button class="btn sm" onclick="toast('已填写进展：完成消防章节佐证整理，进度更新为 70%')">填写进展</button>
+              <button class="btn sm" onclick="toast('已提交延期申请：申请延至 10-15，原因：3 个科室台账未交，待科长审批')">申请延期</button>
+              <button class="btn sm pri" onclick="toast('已提交完成，附交付物清单，待科长验收')">提交完成</button>
+            </span></h3>
+          <div class="kv" style="grid-template-columns:90px 1fr 90px 1fr;">
+            <span class="k">任务类型</span><span>迎检准备（模板套用）</span><span class="k">派单人</span><span>王科长</span>
+            <span class="k">责任人</span><span>王科员</span><span class="k">协办人</span><span>李科员、张班长</span>
+            <span class="k">截止时间</span><span>2026-10-12 <span class="tag orange">剩 3 天</span></span><span class="k">优先级</span><span><span class="tag red">高</span></span>
+            <span class="k">交付物</span><span>《迎检资料册》PDF + 条款自评表 + 缺项补录清单</span><span class="k">验收标准</span><span>32 项条款佐证齐全、缺项已分工</span>
+            <span class="k">关联对象</span><span style="color:var(--primary);cursor:pointer" onclick="go('deploy')">📎 三甲评审部署单 BS20261003002 · 12 条评审条款</span><span class="k">进度</span><span><b>60%</b></span>
+          </div>
+          <h3 style="margin-top:14px"><span class="dot"></span>检查项清单（模板自带，逐项勾选）</h3>
+          <div style="font-size:13px;line-height:2.1">
+            ☑ 收集各科室安全台账（药剂科/设备科/后勤）　☑ 导出巡查与隐患记录　☑ 导出培训档案<br>
+            ☐ 特种设备检验报告归集（氧舱超期待补）　☐ 纸质签字单扫描补录　☐ 条款自评 A/B/C/D
+          </div>
+          <h3 style="margin-top:14px"><span class="dot"></span>进展记录</h3>
+          <div class="tl">
+            <div class="ti done"><div class="tt">09-28 王科长派单</div><div class="td">套用「迎检准备」模板，指定交付物与验收标准，微信推送责任人</div></div>
+            <div class="ti done"><div class="tt">09-30 王科员 更新进度 30%</div><div class="td">已收齐药剂科、设备科台账；后勤缺交（已催办）</div></div>
+            <div class="ti done"><div class="tt">10-06 王科员 更新进度 60%</div><div class="td">完成消防章节佐证整理；发现氧舱检验报告超期，已生成补录任务</div></div>
+            <div class="ti cur"><div class="tt">待提交：条款自评 + 成册导出</div><div class="td">剩余 3 项检查项未勾选；建议优先处理特种设备缺项</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>科员自建任务（支持私有）</h3>
+          <div style="font-size:13px;line-height:2">
+            📝 我的私有任务：整理电梯维保合同到期清单（仅自己可见）<br>
+            📝 已上报科长：联系第三方保安公司确认夜班增派（10-12）<br>
+            <button class="btn sm pri" style="margin-top:8px" onclick="toast('新建个人任务：可设私有或上报科长，支持子任务拆分与清单勾选')">+ 新建任务</button>
+          </div>
+          <h3 style="margin-top:14px"><span class="dot"></span>任务类型模板</h3>
+          <div style="font-size:13px;line-height:2.1">
+            迎检准备 · 月度/季度报告 · 培训组织 · 演练组织 · 专项整治 · 对外协调 · 会议 · 临时交办 · 学习提升<br>
+            <span style="color:var(--text2);font-size:12.5px">模板带默认检查项、时限与交付物，建任务一键套用</span>
+          </div>
+          <h3 style="margin-top:14px"><span class="dot"></span>导出与考核</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn sm" onclick="toast('已导出《科务周例会材料》Word：全科任务进展+逾期+本周完成+下周计划')">📄 周例会材料</button>
+            <button class="btn sm" onclick="toast('已导出《全科任务统计表》：个人完成率/及时率/逾期数，打印签字存档（双轨制）')">🖨 任务统计表</button>
+          </div>
+          <div style="margin-top:10px;font-size:12.5px;color:var(--text2);line-height:1.8">
+            评价打分开关可配：验收时可打分，作为科内绩效参考（默认关闭，由医院自行决定）。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 一站式服务台 -->
+    <div class="page" id="p-svc">
+      <h2 class="pt">报事服务台（一站式服务入口）</h2><div class="pt-sub">面向科室与患者家属的统一报事入口 · 报隐患 / 报修 / 报服务 三类诉求统一受理、按类路由、各走各的时限</div>
+      <div class="grid" style="grid-template-columns:repeat(5,1fr);">
+        <div class="stat"><div class="l">本月受理总量</div><div class="n">486</div><div class="l">隐患 132 · 报修 268 · 服务 86</div></div>
+        <div class="stat"><div class="l">患者扫码上报</div><div class="n">147</div><div class="l">占比 30% · 免登录</div></div>
+        <div class="stat"><div class="l">平均响应时长</div><div class="n" style="color:var(--green)">8.4 分</div><div class="l">目标 ≤15 分钟</div></div>
+        <div class="stat"><div class="l">SLA 超时</div><div class="n" style="color:var(--orange)">6</div><div class="l">已自动升级提醒</div></div>
+        <div class="stat"><div class="l">满意度</div><div class="n" style="color:var(--green)">4.6</div><div class="l">回收评价 312 条</div></div>
+      </div>
+      <div class="pill-tab">
+        <button class="on" onclick="tabBtn(this)">全部 486</button><button onclick="tabBtn(this)">报隐患 132</button><button onclick="tabBtn(this)">报修 268</button><button onclick="tabBtn(this)">报服务 86</button><button onclick="tabBtn(this)">待受理 11</button><button onclick="tabBtn(this)">已超时 6</button>
+      </div>
+      <div class="grid" style="grid-template-columns:1.45fr 1fr;margin-top:0;">
+        <div class="card">
+          <h3><span class="dot"></span>统一受理池（按类型分区，不混排）
+            <span style="margin-left:auto;display:flex;gap:8px;">
+              <button class="btn sm" onclick="toast('已导出《本月报事服务台账》Excel，含来源、责任方、SLA 与满意度')">📊 导出台账</button>
+            </span></h3>
+          <table class="tb">
+            <tr><th>单号</th><th>类型</th><th>来源</th><th>内容</th><th>位置</th><th>责任方</th><th>SLA</th><th>状态</th><th>操作</th></tr>
+            <tr><td class="mono">YH20261004018</td><td><span class="tag red">报隐患</span></td><td>二维码 · 患者</td><td>3F 走廊被病床占用</td><td>住院部 3F</td><td>安保班组</td><td>剩 1h20m</td><td><span class="tag orange">处置中</span></td><td><button class="btn sm pri">处理</button></td></tr>
+            <tr><td class="mono">BX20261004031</td><td><span class="tag blue">报修</span></td><td>小程序 · 护士站</td><td>女卫门锁损坏</td><td>门诊 2F</td><td>后勤保障部</td><td>剩 6h</td><td><span class="tag orange">已派单</span></td><td><button class="btn sm">处理</button></td></tr>
+            <tr><td class="mono">FW20261004007</td><td><span class="tag green">报服务</span></td><td>二维码 · 家属</td><td>老人门诊走失，寻人</td><td>门诊 1F</td><td>安保班组</td><td style="color:var(--red)">超时 4m</td><td><span class="tag red">超时</span></td><td><button class="btn sm pri">催办</button></td></tr>
+            <tr><td class="mono">BX20261004028</td><td><span class="tag blue">报修</span></td><td>二维码 · 患者</td><td>病房空调不制冷</td><td>住院部 5F</td><td>设备科</td><td>剩 20h</td><td><span class="tag orange">已派单</span></td><td><button class="btn sm">处理</button></td></tr>
+            <tr><td class="mono">YH20261004015</td><td><span class="tag red">报隐患</span></td><td>职工 · 药剂科</td><td>库房门口堆放纸箱</td><td>门诊 1F 药库</td><td>药剂科+安保</td><td>剩 2 天</td><td><span class="tag orange">待验收</span></td><td><button class="btn sm">验收</button></td></tr>
+            <tr><td class="mono">FW20261004002</td><td><span class="tag green">报服务</span></td><td>小程序 · 科室</td><td>护送行动不便患者做 CT</td><td>住院部 8F</td><td>安保班组</td><td>—</td><td><span class="tag green">已完成</span></td><td><button class="btn sm">查看</button></td></tr>
+            <tr><td class="mono">BX20261004019</td><td><span class="tag blue">报修</span></td><td>二维码 · 患者</td><td>电梯运行有异响</td><td>住院部 2#梯</td><td>迅达维保</td><td>—</td><td><span class="tag green">已完成</span></td><td><button class="btn sm">查看</button></td></tr>
+          </table>
+          <div style="margin-top:8px;font-size:12.5px;color:var(--text2)">🔀 路由规则命中示例：「电梯异响」→ 自动派给<b>电梯维保单位</b>并同时通知设备科；「门锁/照明」→ 后勤保障部；「通道占用/消防设施」→ 安保班组；「寻人走失」→ 安保班组 + 触发广播与监控调阅。</div>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>智能路由与 SLA 配置</h3>
+          <table class="tb">
+            <tr><th>诉求类别</th><th>路由责任方</th><th>响应</th><th>完成</th></tr>
+            <tr><td>报隐患 · 一级</td><td>安保班组（立即出警）</td><td>5 分</td><td>2 小时</td></tr>
+            <tr><td>报隐患 · 二级</td><td>安保班组 + 属地科室</td><td>15 分</td><td>24 小时</td></tr>
+            <tr><td>报隐患 · 三级</td><td>属地科室</td><td>60 分</td><td>7 天</td></tr>
+            <tr><td>报修 · 紧急</td><td>后勤/设备/维保</td><td>15 分</td><td>4 小时</td></tr>
+            <tr><td>报修 · 一般</td><td>后勤保障部</td><td>30 分</td><td>24 小时</td></tr>
+            <tr><td>报服务 · 寻人</td><td>安保班组（+广播监控）</td><td>5 分</td><td>—</td></tr>
+            <tr><td>报服务 · 一般</td><td>安保班组</td><td>10 分</td><td>60 分</td></tr>
+            <tr><td>咨询建议 / 投诉</td><td>安保科</td><td>2 小时</td><td>48 小时</td></tr>
+          </table>
+          <div style="margin-top:8px;font-size:12.5px;color:var(--text2)">⚙️ 类别、子项、表单字段、路由责任方、时限、升级链<b>全部后台可配</b>；报修类预留「转发外部系统」路由位，二期对接后勤/物资系统时按类别转发，业务侧无感。</div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn sm" onclick="toast('已进入分类与路由规则配置：可增删类别、调整字段与责任方')">⚙️ 分类与路由配置</button>
+            <button class="btn sm" onclick="toast('已生成 86 张二维码（按楼层点位编号），可导出打印张贴')">🔳 生成二维码</button>
+          </div>
+        </div>
+      </div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;">
+        <div class="card">
+          <h3><span class="dot"></span>二维码点位与来源分析</h3>
+          <table class="tb">
+            <tr><th>张贴位置</th><th>码值</th><th>本月扫码</th><th>高发诉求</th></tr>
+            <tr><td>住院部 3F 护士站旁</td><td class="mono">QR-A3-012</td><td>38</td><td>报修 · 卫生间设施</td></tr>
+            <tr><td>门诊 1F 大厅导医台</td><td class="mono">QR-B1-001</td><td>31</td><td>报服务 · 咨询/寻人</td></tr>
+            <tr><td>住院部 5F 电梯厅</td><td class="mono">QR-A5-020</td><td>26</td><td>报修 · 空调</td></tr>
+            <tr><td>门诊 2F 女卫门口</td><td class="mono">QR-B2-007</td><td>19</td><td>报修 · 门锁</td></tr>
+            <tr><td>急诊科通道</td><td class="mono">QR-C1-003</td><td>17</td><td>报隐患 · 通道占用</td></tr>
+          </table>
+          <div style="margin-top:8px;font-size:12.5px;color:var(--text2)">📈 点位即数据：高发诉求自动浮现（住院部 3F 卫生间设施报修 38 次）→ 大脑建议纳入专项整治与科室考核。</div>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>进度反馈与满意度</h3>
+          <div style="font-size:12.8px;line-height:2">
+            <div style="padding:7px 0;border-bottom:1px solid var(--line)">上报人可见全过程：<b>受理 → 派单 → 处理 → 完成</b>，每步微信推送</div>
+            <div style="padding:7px 0;border-bottom:1px solid var(--line)">患者凭<b>查询码</b>或微信身份追踪，无需注册登录</div>
+            <div style="padding:7px 0;border-bottom:1px solid var(--line)">完成后可评价（开关可配）：本月回收 312 条，平均 <b style="color:var(--green)">4.6 分</b></div>
+            <div style="padding:7px 0;border-bottom:1px solid var(--line)">低分单据（≤2 星）共 <b style="color:var(--red)">7 条</b> → 自动生成回访工单并纳入第三方绩效（T）</div>
+            <div style="padding:7px 0">敏感照片默认打码；患者手机号仅用于联系，处理后脱敏留存</div>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn sm" onclick="toast('已导出《满意度与低分单据回访清单》')">📄 满意度清单</button>
+            <button class="btn sm" onclick="toast('低分单据已批量生成回访工单并推送责任班组')">🔁 生成回访工单</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第三方供应商绩效 -->
+    <div class="page" id="p-vendor">
+      <h2 class="pt">第三方供应商执行绩效</h2><div class="pt-sub">保安 / 物业 / 消防维保 / 电梯维保 / 施工单位 —— 执行数据自动归集出分，挂钩续约与扣款 · 全部数据取自工单/巡查/维保/作业票/培训，零人工填报</div>
+      <div class="grid" style="grid-template-columns:repeat(5,1fr);">
+        <div class="stat"><div class="l">在册供应商</div><div class="n">6</div><div class="l">保安 2 · 维保 2 · 物业 1 · 施工 1</div></div>
+        <div class="stat"><div class="l">本月平均得分</div><div class="n" style="color:var(--green)">87.6</div><div class="l">较上月 ↑2.3</div></div>
+        <div class="stat"><div class="l">红牌单位（&lt;80）</div><div class="n" style="color:var(--red)">1</div><div class="l">已发整改通知单</div></div>
+        <div class="stat"><div class="l">待整改 / 待复核申诉</div><div class="n" style="color:var(--orange)">4 / 2</div><div class="l">申诉期 3 日内</div></div>
+        <div class="stat"><div class="l">本月自动扣分</div><div class="n">-9.5</div><div class="l">来源：超时 3 · 退回 2 · 漏巡 1</div></div>
+      </div>
+      <div class="pill-tab">
+        <button class="on" onclick="tabBtn(this)">全部 6</button><button onclick="tabBtn(this)">保安服务 2</button><button onclick="tabBtn(this)">物业保洁 1</button><button onclick="tabBtn(this)">消防维保 1</button><button onclick="tabBtn(this)">电梯维保 1</button><button onclick="tabBtn(this)">工程施工 1</button>
+      </div>
+      <div class="grid" style="grid-template-columns:1.4fr 1fr;margin-top:0;">
+        <div class="card">
+          <h3><span class="dot"></span>供应商绩效评分卡（2026-09）
+            <span style="margin-left:auto;display:flex;gap:8px;">
+              <button class="btn sm" onclick="toast('已按模板导出《2026年9月第三方履约绩效汇总表》Excel')">📊 导出汇总表</button>
+            </span></h3>
+          <table class="tb">
+            <tr><th>单位</th><th>服务类别</th><th>合同期</th><th>本月得分</th><th>等级</th><th>环比</th><th>待整改</th><th>操作</th></tr>
+            <tr style="cursor:pointer;background:#f6fdfa" onclick="toast('已在下方展开「安泰保安」绩效详情：指标明细+扣分+申诉')"><td><b>安泰保安服务有限公司</b></td><td>保安服务</td><td>2026.01~2026.12</td><td style="color:var(--green);font-weight:700">92.4</td><td><span class="tag green">绿</span></td><td>↑1.8</td><td>0</td><td><button class="btn sm pri">详情</button></td></tr>
+            <tr><td>康洁物业（院区保洁）</td><td>物业保洁</td><td>2026.03~2027.02</td><td style="color:var(--green);font-weight:700">88.1</td><td><span class="tag green">绿</span></td><td>↑0.6</td><td>1</td><td><button class="btn sm">详情</button></td></tr>
+            <tr><td>迅达电梯维保</td><td>电梯维保</td><td>2025.07~2026.06</td><td style="color:var(--orange);font-weight:700">83.7</td><td><span class="tag orange">黄</span></td><td>↓1.2</td><td>1</td><td><button class="btn sm">详情</button></td></tr>
+            <tr><td>宏安消防工程（维保）</td><td>消防维保</td><td>2026.01~2026.12</td><td style="color:var(--orange);font-weight:700">81.5</td><td><span class="tag orange">黄</span></td><td>↑3.4</td><td>2</td><td><button class="btn sm">详情</button></td></tr>
+            <tr><td>恒信建筑工程</td><td>工程施工</td><td>2026.05~2026.11</td><td style="color:var(--red);font-weight:700">76.2</td><td><span class="tag red">红</span></td><td>↓5.1</td><td>2</td><td><button class="btn sm">详情</button></td></tr>
+            <tr><td>明盾安保（夜班班组）</td><td>保安服务</td><td>2026.06~2027.05</td><td style="color:var(--orange);font-weight:700">85.0</td><td><span class="tag orange">黄</span></td><td>↑2.0</td><td>1</td><td><button class="btn sm">详情</button></td></tr>
+          </table>
+          <div style="margin-top:8px;font-size:12.5px;color:var(--text2)">评分口径：指标得分 × 权重 求和；绿 ≥90 / 黄 80~89 / 红 &lt;80 —— 阈值与权重按合同逐家配置（详见下方「考核指标配置」）</div>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>大脑预警 · 扣分事件流</h3>
+          <div style="font-size:12.8px;line-height:2">
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)"><span class="tag red">超时</span> 恒信建筑 工单 SG20260918007 超期 <b>3 天</b>未销票 → 扣 2 分 · 已发整改通知</div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)"><span class="tag red">退回</span> 宏安消防 月度维保记录验收<b>退回重办</b>（2 个点位未拍照）→ 扣 1.5 分</div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)"><span class="tag orange">漏巡</span> 明盾安保 夜班 9/12 漏 1 个点位 → 扣 1 分 · 已提醒班长</div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)"><span class="tag orange">超时</span> 迅达电梯 困人救援到场 <b>34 分钟</b>（SLA 30 分钟）→ 扣 2 分 · <span style="color:var(--primary)">申诉中</span></div>
+            <div style="padding:8px 0;border-bottom:1px solid var(--line)"><span class="tag orange">持证</span> 恒信建筑 现场 2 人特种作业证<b>临期 12 天</b> → 预警，未扣分（整改期内）</div>
+            <div style="padding:8px 0"><span class="tag green">提示</span> 安泰保安 本月培训完成率 100%、巡查完成率 99.2% —— 建议列为续约优先</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><span class="dot"></span>绩效详情 · 恒信建筑工程（本月 <span style="color:var(--red)">76.2 红牌</span>）
+          <span style="margin-left:auto;display:flex;gap:8px;">
+            <button class="btn sm" onclick="toast('已生成《整改通知单》No.TZ202609003，可导出打印签字')">📄 整改通知单</button>
+            <button class="btn sm pri" onclick="toast('已生成《2026年9月履约绩效评估报告》PDF，待双方签字确认存档')">📑 绩效报告</button>
+          </span></h3>
+        <div class="grid" style="grid-template-columns:1fr 1fr;">
+          <div>
+            <table class="tb">
+              <tr><th>考核指标</th><th>目标</th><th>实际</th><th>权重</th><th>得分</th></tr>
+              <tr><td>响应及时率</td><td>≥95%</td><td>88%</td><td>15%</td><td style="color:var(--orange)">11.1</td></tr>
+              <tr><td>到场及时率</td><td>≥95%</td><td>90%</td><td>15%</td><td style="color:var(--orange)">12.0</td></tr>
+              <tr><td>按期完成率</td><td>≥95%</td><td style="color:var(--red)">78%</td><td>20%</td><td style="color:var(--red)">13.1</td></tr>
+              <tr><td>一次验收合格率</td><td>≥90%</td><td style="color:var(--red)">71%</td><td>15%</td><td style="color:var(--red)">9.6</td></tr>
+              <tr><td>作业票规范率</td><td>100%</td><td>92%</td><td>10%</td><td style="color:var(--orange)">9.2</td></tr>
+              <tr><td>持证上岗率</td><td>100%</td><td>96%</td><td>10%</td><td style="color:var(--orange)">9.6</td></tr>
+              <tr><td>培训完成率</td><td>100%</td><td style="color:var(--green)">100%</td><td>10%</td><td style="color:var(--green)">10.0</td></tr>
+              <tr><td>有效投诉 / 违规作业</td><td>0 次</td><td style="color:var(--red)">2 次</td><td>5%</td><td style="color:var(--red)">1.6</td></tr>
+              <tr style="background:#fff8f7"><td><b>合计</b></td><td>—</td><td>—</td><td><b>100%</b></td><td style="color:var(--red);font-weight:700">76.2</td></tr>
+            </table>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:8px">扣分明细与整改</div>
+            <div style="font-size:12.8px;line-height:1.9;color:var(--text2)">
+              <div style="padding:7px 10px;background:#fff8f7;border-left:3px solid var(--red);border-radius:6px;margin-bottom:8px">
+                <b style="color:var(--text)">-2.0 分</b> · 工单 SG20260918007 超期 3 天未销票<br>
+                整改通知 No.TZ202609003 · 限期 3 日 · <span class="tag orange">整改中</span>
+              </div>
+              <div style="padding:7px 10px;background:#fff8f7;border-left:3px solid var(--red);border-radius:6px;margin-bottom:8px">
+                <b style="color:var(--text)">-1.5 分</b> · 动火作业监护未全程在场（抽查 3 次缺 1 次）<br>
+                整改通知 No.TZ202609004 · 限期 5 日 · <span class="tag orange">整改中</span>
+              </div>
+              <div style="padding:7px 10px;background:#f7f9fc;border-left:3px solid var(--primary);border-radius:6px;margin-bottom:8px">
+                <b style="color:var(--text)">申诉 1 条</b> · "9/18 停工系院方临时调整工期所致，非我方责任"<br>
+                附证据：医务科通知截图 · <span class="tag orange">待安保科复核</span><br>
+                <button class="btn sm" style="margin-top:6px" onclick="toast('已调取工单时间线比对：院方通知于停工当日 14:20 发出 → 判定部分成立，扣减 1.0 分')">复核并比对证据</button>
+              </div>
+              <div style="padding:7px 10px;background:#f6fdfa;border-left:3px solid var(--green);border-radius:6px">
+                <b style="color:var(--text)">历史趋势</b> · 6 月 88.0 → 7 月 84.5 → 8 月 81.3 → 9 月 <b style="color:var(--red)">76.2</b><br>
+                大脑建议：<b>连续 3 月下滑且已红牌</b>，建议约谈项目负责人并纳入下次招标负面清单评估
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1fr 1fr;">
+        <div class="card">
+          <h3><span class="dot"></span>考核指标与权重配置（按合同逐家可配）</h3>
+          <table class="tb">
+            <tr><th>指标</th><th>目标值</th><th>权重</th><th>数据来源</th></tr>
+            <tr><td>响应及时率</td><td>≥95%</td><td>15%</td><td class="mono" style="font-size:11.5px">wo_order 接单时长</td></tr>
+            <tr><td>到场及时率</td><td>≥95%</td><td>15%</td><td class="mono" style="font-size:11.5px">wo_flow_log 打卡</td></tr>
+            <tr><td>按期完成率</td><td>≥95%</td><td>20%</td><td class="mono" style="font-size:11.5px">wo_order 完成时间</td></tr>
+            <tr><td>一次验收合格率</td><td>≥90%</td><td>15%</td><td class="mono" style="font-size:11.5px">wo_flow_log 退回</td></tr>
+            <tr><td>巡查/维保完成率</td><td>≥98%</td><td>10%</td><td class="mono" style="font-size:11.5px">mod_patrol / mod_equip</td></tr>
+            <tr><td>持证上岗率</td><td>100%</td><td>10%</td><td class="mono" style="font-size:11.5px">sys_third_party_cert</td></tr>
+            <tr><td>培训完成率</td><td>100%</td><td>10%</td><td class="mono" style="font-size:11.5px">mod_train_record</td></tr>
+            <tr><td>投诉 / 违规扣分</td><td>0 次</td><td>5%</td><td class="mono" style="font-size:11.5px">服务入口 + 作业票</td></tr>
+          </table>
+          <div style="margin-top:8px;font-size:12.5px;color:var(--text2)">⚙️ 指标项、目标值、权重、计分公式均可后台配置；<b>不同合同可套不同模板</b>（保安 / 维保 / 施工口径不同）。建议<b>招标或续约前</b>先把指标表定下来并写进合同，避免事后争议。</div>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>供应商主档与资质（到期预警）</h3>
+          <table class="tb">
+            <tr><th>单位</th><th>驻场</th><th>持证率</th><th>证照</th><th>合同到期</th></tr>
+            <tr><td>安泰保安</td><td>32 / 32 人</td><td style="color:var(--green)">100%</td><td><span class="tag green">有效</span></td><td>2026-12-31</td></tr>
+            <tr><td>明盾安保</td><td>14 / 16 人</td><td style="color:var(--orange)">93%</td><td><span class="tag green">有效</span></td><td>2027-05-31</td></tr>
+            <tr><td>迅达电梯</td><td>5 / 5 人</td><td style="color:var(--green)">100%</td><td><span class="tag orange">45 天到期</span></td><td>2026-06-30</td></tr>
+            <tr><td>宏安消防</td><td>6 / 6 人</td><td style="color:var(--green)">100%</td><td><span class="tag green">有效</span></td><td>2026-12-31</td></tr>
+            <tr><td>恒信建筑</td><td>18 / 18 人</td><td style="color:var(--red)">89%</td><td><span class="tag red">1 项已过期</span></td><td>2026-11-30</td></tr>
+          </table>
+          <div style="margin-top:8px;font-size:12.5px;color:var(--text2)">🧠 大脑规则：驻场人数少于合同约定自动预警（明盾 14/16）；证照到期 60 天预警并阻断新工单派发；持证率低于目标自动扣分并生成整改通知。</div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn sm" onclick="toast('已导出《驻场人员名册与持证台账》')">👥 人员名册</button>
+            <button class="btn sm" onclick="toast('已导出全部供应商证照到期清单')">📇 证照清单</button>
+            <button class="btn sm" onclick="toast('已生成续约评审材料包（含全年绩效趋势+整改闭环记录）')">🔁 续约评审包</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 工作部署台 -->
+    <div class="page" id="p-deploy">
+      <h2 class="pt">工作部署台</h2><div class="pt-sub">场景卡片式专项部署 · 大脑生成方案包 · 逐项确认 · 一键联动业务模块</div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(196px,1fr));">
+        <div class="card" style="text-align:center;cursor:pointer;border-top:3px solid #0f6e56" onclick="startDeploy('review')">
+          <div style="font-size:30px">🏥</div><b>三甲评审配合</b>
+          <div style="font-size:12px;color:var(--text2);margin-top:6px">评审安保条款梳理 + 资料自动归集 + 一键成册</div>
+          <button class="btn pri sm" style="margin-top:10px">发起部署</button>
+        </div>
+        <div class="card" style="text-align:center;cursor:pointer;border-top:3px solid var(--blue)" onclick="startDeploy('typhoon')">
+          <div style="font-size:30px">🌀</div><b>防台风部署</b>
+          <div style="font-size:12px;color:var(--text2);margin-top:6px">气象预警触发或手动发起，按档案自动定制</div>
+          <button class="btn pri sm" style="margin-top:10px">发起部署</button>
+        </div>
+        <div class="card" style="text-align:center;cursor:pointer;border-top:3px solid var(--orange)" onclick="toast('节前部署场景：生成假期值守+巡查加频+重点部位布防方案包')">
+          <div style="font-size:30px">🎆</div><b>节前安全部署</b>
+          <div style="font-size:12px;color:var(--text2);margin-top:6px">节假日值守、巡查加频、离院科室断电核查</div>
+          <button class="btn pri sm" style="margin-top:10px">发起部署</button>
+        </div>
+        <div class="card" style="text-align:center;cursor:pointer;border-top:3px solid var(--green)" onclick="toast('迎检部署场景：按检查清单生成立项整改+台账备查+陪同分工方案包')">
+          <div style="font-size:30px">📋</div><b>迎检部署</b>
+          <div style="font-size:12px;color:var(--text2);margin-top:6px">消防/卫健检查前的自查整改与台账准备</div>
+          <button class="btn pri sm" style="margin-top:10px">发起部署</button>
+        </div>
+        <div class="card" style="text-align:center;cursor:pointer;border-top:3px solid #98a2b3" onclick="toast('自定义部署：用一句话描述要部署的工作，大脑拆解成任务包')">
+          <div style="font-size:30px">⚙️</div><b>自定义部署</b>
+          <div style="font-size:12px;color:var(--text2);margin-top:6px">自由描述需求，大脑编排任务</div>
+          <button class="btn sm" style="margin-top:10px">发起部署</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="dot"></span>部署单列表</h3>
+        <table class="tb">
+          <tr><th>部署单号</th><th>场景</th><th>发起人</th><th>任务数</th><th>整体完成率</th><th>状态</th><th>操作</th></tr>
+          <tr style="cursor:pointer;background:#f6fdfa" onclick="document.getElementById('reviewDetail').style.display='block'"><td class="mono">BS20261004002</td><td>🏥 三甲评审 · 安保部分</td><td>王科长</td><td>32 项材料</td><td><span style="color:var(--orange)">自动归集 21 / 待补 8 / 无数据 3</span></td><td><span class="tag orange">准备中</span></td><td><button class="btn sm pri">查看</button></td></tr>
+          <tr style="cursor:pointer" onclick="document.getElementById('deployDetail').style.display='block'"><td class="mono">BS20261004001</td><td>🌀 防台风「麦德姆」</td><td>王科长</td><td>8</td><td><span style="color:var(--orange)">5/8 · 62%</span></td><td><span class="tag orange">执行中</span></td><td><button class="btn sm">查看</button></td></tr>
+          <tr><td class="mono">BS20260928002</td><td>🎆 国庆节前部署</td><td>王科长</td><td>11</td><td>11/11 · 100%</td><td><span class="tag green">已完成</span></td><td><button class="btn sm" onclick="toast('已导出部署纪要 PDF（可打印存档）')">导出纪要</button></td></tr>
+        </table>
+      </div>
+      <div class="card" id="reviewDetail" style="display:none;border-top:3px solid #0f6e56">
+        <h3><span class="dot" style="background:#0f6e56"></span>部署单 BS20261004002 · 三甲评审（安保部分）
+          <span style="margin-left:auto;display:flex;gap:8px;">
+            <button class="btn sm" onclick="toast('已按评审章节生成《迎检资料册》：目录+条款+附件，PDF/Word 均可')">📄 一键生成迎检资料册</button>
+            <button class="btn sm" onclick="toast('任务已下发，进入 A/B/C/D 自评表')">条款自评</button>
+            <button class="btn sm pri" onclick="toast('已向 3 个科室发送资料补录催办')">一键催办</button>
+          </span>
+        </h3>
+        <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px;">
+          <div class="stat" style="margin:0"><div class="l">评审安保条款</div><div class="n" style="font-size:22px">32</div><div class="l">覆盖消防/治安/危化品/特设/应急/培训</div></div>
+          <div class="stat" style="margin:0"><div class="l">系统自动归集</div><div class="n" style="font-size:22px;color:var(--green)">21</div><div class="l">巡查/隐患/作业票/培训/维保数据直接成证</div></div>
+          <div class="stat" style="margin:0"><div class="l">待补录</div><div class="n" style="font-size:22px;color:var(--orange)">8</div><div class="l">缺环节：MSDS、年检单等</div></div>
+          <div class="stat" style="margin:0"><div class="l">系统无数据</div><div class="n" style="font-size:22px;color:var(--text2)">3</div><div class="l">纸质档案，需上传扫描件</div></div>
+        </div>
+        <div class="brain-box" style="margin-bottom:12px">
+          <div class="bh">🧠 大脑方案包 · 生成依据</div>
+          <div style="font-size:12.8px;line-height:1.9">依据《三级医院评审标准（2022 年版）》第三部分 第六章「医院管理」及本省实施细则，结合本院档案（<b>2 院区 / 6 楼宇 / 消控室 1 个 / 危化品暂存点 2 处 / 特种设备 14 台</b>）自动筛选适用条款，生成 32 项证明材料清单并分工到人。<br>
+          <b>核心价值：不再年底翻箱倒柜——评审要的材料，绝大部分平时跑业务时就已经自动沉淀在系统里。</b></div>
+        </div>
+        <table class="tb">
+          <tr><th>评审条款</th><th>需提供材料</th><th>系统归集</th><th>责任人</th><th>状态</th></tr>
+          <tr><td class="mono">6.5.1 消防安全管理</td><td>消防设施年度检测报告 + 维保记录</td><td><span class="tag green">✅ 自动归集 12 份维保工单</span></td><td>设备科·孙**</td><td><span class="tag green">已齐备</span></td></tr>
+          <tr><td class="mono">6.5.2 消控室 24h 双人持证</td><td>排班表 + 操作员证 + 值班日志</td><td><span class="tag yellow">⚠️ 部分：缺 2025 年度存档</span></td><td>安保科·值班组</td><td><span class="tag orange">待补录</span></td></tr>
+          <tr><td class="mono">6.5.3 每日防火巡查</td><td>近一年防火巡查记录台账</td><td><span class="tag green">✅ 自动归集 364 天记录</span></td><td>安保科</td><td><span class="tag green">已齐备</span></td></tr>
+          <tr><td class="mono">6.5.4 动火作业管理</td><td>动火审批票 + 现场监护记录</td><td><span class="tag green">✅ 自动归集 18 张作业票</span></td><td>安保科</td><td><span class="tag green">已齐备</span></td></tr>
+          <tr><td class="mono">6.6.1 危险化学品管理</td><td>目录 + MSDS + 双人双锁领用记录</td><td><span class="tag yellow">⚠️ 部分：缺 MSDS 上传</span></td><td>药剂科·陈**</td><td><span class="tag orange">待补录</span></td></tr>
+          <tr><td class="mono">6.7.1 特种设备安全</td><td>使用登记证 + 定检报告 + 作业人员证</td><td><span class="tag gray">⬜ 系统无（纸质）</span></td><td>设备科·孙**</td><td><span class="tag red">待上传</span></td></tr>
+          <tr><td class="mono">6.8.1 应急预案与演练</td><td>预案汇编 + 每半年演练记录</td><td><span class="tag green">✅ 自动归集 2 次演练</span></td><td>安保科</td><td><span class="tag green">已齐备</span></td></tr>
+          <tr><td class="mono">6.8.3 医用气体安全</td><td>氧站/汇流排间巡查与维保记录</td><td><span class="tag green">✅ 自动归集 52 条记录</span></td><td>总务科·刘**</td><td><span class="tag green">已齐备</span></td></tr>
+          <tr><td class="mono">6.9.1 安全教育培训</td><td>全员培训档案 + 新员工岗前培训</td><td><span class="tag green">✅ 自动归集 589 人档案</span></td><td>安保科</td><td><span class="tag green">已齐备</span></td></tr>
+          <tr><td class="mono">6.10 隐患排查治理</td><td>隐患台账 + 整改闭环记录（含双重预防）</td><td><span class="tag green">✅ 自动归集 268 条闭环</span></td><td>安保科</td><td><span class="tag green">已齐备</span></td></tr>
+        </table>
+        <div style="margin-top:10px;font-size:12.5px;color:var(--text2)">💡 每项材料可点开查看归集明细；「系统无」项标注为纸质档案，需上传扫描件后自动入册。整套资料按评审章节自动编目导出。</div>
+      </div>
+      <div class="card" id="deployDetail" style="display:none">
+        <h3><span class="dot"></span>部署单 BS20261004001 · 防台风「麦德姆」
+          <span style="margin-left:auto;display:flex;gap:8px;">
+            <button class="btn sm" onclick="toast('已导出部署纪要 PDF')">📄 导出纪要</button>
+            <button class="btn sm pri" onclick="toast('已向 3 个未完成任务的责任人发送催办')">一键催办</button>
+          </span>
+        </h3>
+        <div class="brain-box" style="margin-bottom:12px">
+          <div class="bh">🧠 大脑方案包 · 生成依据</div>
+          <div style="font-size:12.8px;line-height:1.9">场景模板「防台风」+ 本院档案自动定制：识别到 <b>户外风险区 2 处</b>（中心氧站、临时车棚）、<b>老旧楼宇 1 栋</b>（2 号楼 1998 年建）、<b>B1 低洼层有配电房 1 间</b>、在建施工点 1 处——已据此生成 8 项部署任务。</div>
+        </div>
+        <table class="tb">
+          <tr><th>部署任务</th><th>落入模块</th><th>责任人</th><th>下发模式</th><th>确认</th><th>执行状态</th></tr>
+          <tr><td>氧站/车棚加固与每日 2 次特巡（至预警解除）</td><td>巡查管理</td><td>巡逻一班</td><td><span class="tag gray">强制下发</span></td><td><span class="switch on"></span></td><td><span class="tag green">执行中</span></td></tr>
+          <tr><td>B1 配电房防水挡板+沙袋布置核查</td><td>隐患工单</td><td>设备科·孙**</td><td><span class="tag gray">强制下发</span></td><td><span class="switch on"></span></td><td><span class="tag green">已完成</span></td></tr>
+          <tr><td>2 号楼屋面及外墙附着物排查</td><td>隐患工单</td><td>巡逻二班</td><td><span class="tag blue">需确认</span></td><td><span class="switch on"></span></td><td><span class="tag orange">进行中</span></td></tr>
+          <tr><td>全院户外区域风险区临时提级（橙→红）</td><td>风险区自查</td><td>各属地安全员</td><td><span class="tag blue">需确认</span></td><td><span class="switch on"></span></td><td><span class="tag green">已生效</span></td></tr>
+          <tr><td>施工点停工通知+脚手架加固验收</td><td>作业票模块</td><td>基建办</td><td><span class="tag gray">强制下发</span></td><td><span class="switch on"></span></td><td><span class="tag green">已完成</span></td></tr>
+          <tr><td>应急物资核查（沙袋/抽水泵/应急灯）</td><td>隐患工单</td><td>库房·赵**</td><td><span class="tag gray">强制下发</span></td><td><span class="switch on"></span></td><td><span class="tag red">逾期 1h</span></td></tr>
+          <tr><td>全员防台风应急须知（15 分钟微课）</td><td>安全培训</td><td>全院职工</td><td><span class="tag gray">强制下发</span></td><td><span class="switch on"></span></td><td><span class="tag orange">完成率 71%</span></td></tr>
+          <tr><td style="color:var(--text2)"><s>食堂户外广告牌拆除（大脑建议，科长已移除）</s></td><td>—</td><td>—</td><td>—</td><td><span class="switch"></span></td><td><span class="tag gray">已移除</span></td></tr>
+        </table>
+        <div style="margin-top:10px;font-size:12.5px;color:var(--text2)">💡 发布前可逐项确认/修改/移除；发布后任务落进对应模块闭环，部署单自动汇总完成率。全部操作留痕。</div>
+      </div>
+    </div>
+
+    <!-- 规则配置 -->
+    <div class="page" id="p-rules">
+      <h2 class="pt">规则配置</h2><div class="pt-sub">Aviator 表达式 · 提醒式/闭环式 双模式 · 国标预置 + 院规自定义</div>
+      <div class="card">
+        <table class="tb">
+          <tr><th>规则</th><th>类别</th><th>判别表达式</th><th>响应模式</th><th>来源</th><th>启用</th></tr>
+          <tr><td>灭火器临期 30 天预警</td><td>消防器材</td><td class="mono">ext.下次检验日期 - today &lt;= 30</td><td><span class="tag blue">提醒式</span></td><td><span class="tag gray">国标预置</span></td><td><span class="switch on" onclick="this.classList.toggle('on')"></span></td></tr>
+          <tr><td>疏散通道占用</td><td>疏散</td><td class="mono">report.type == '通道占用'</td><td><span class="tag red">闭环式</span></td><td><span class="tag gray">国标预置</span></td><td><span class="switch on" onclick="this.classList.toggle('on')"></span></td></tr>
+          <tr><td>贵重药品库双人双锁</td><td>治安/库房</td><td class="mono">check.开锁人数 &lt; 2</td><td><span class="tag red">闭环式</span></td><td><span class="tag green">本院院规</span></td><td><span class="switch on" onclick="this.classList.toggle('on')"></span></td></tr>
+          <tr><td>精神科病房每 2h 巡查</td><td>巡查</td><td class="mono">now - last(巡查时间) &gt; 2h</td><td><span class="tag blue">提醒式</span></td><td><span class="tag green">本院院规</span></td><td><span class="switch on" onclick="this.classList.toggle('on')"></span></td></tr>
+          <tr><td>消控室双人持证在岗</td><td>消防值守</td><td class="mono">count(在岗.持证) &lt; 2</td><td><span class="tag red">闭环式</span></td><td><span class="tag gray">国标预置</span></td><td><span class="switch on" onclick="this.classList.toggle('on')"></span></td></tr>
+        </table>
+        <button class="btn" style="margin-top:12px" onclick="toast('新建规则：选数据源→写表达式（提供向导模式）→挂预案→选响应模式')">+ 新建规则（向导模式，不懂表达式也能配）</button>
+      </div>
+    </div>
+
+    <!-- 知识库 -->
+    <div class="page" id="p-kb">
+      <h2 class="pt">标准知识库</h2><div class="pt-sub">条款级入库 · 平台国标库（只读，持续更新）+ 院规库（自维护）+ 院级场景处置卡</div>
+      <div class="pill-tab">
+        <button class="on" onclick="kbTab(this,'kbStd')">国标库（平台维护）</button>
+        <button onclick="kbTab(this,'kbLocal')">院规库（本院制度）</button>
+        <button onclick="kbTab(this,'kbCard')">🧩 场景处置卡（院规 SOP）</button>
+      </div>
+
+      <div class="card" id="kbStd">
+        <table class="tb">
+          <tr><th>标准号</th><th>名称</th><th>层级</th><th>类别</th><th>条款数</th><th>已挂规则</th><th>版本状态</th></tr>
+          <tr><td class="mono">GB 55037-2022</td><td>建筑防火通用规范</td><td><span class="tag red">通用规范·底线</span></td><td>建筑防火</td><td>312</td><td>28</td><td><span class="tag green">现行</span></td></tr>
+          <tr><td class="mono">GB 55036-2022</td><td>消防设施通用规范</td><td><span class="tag red">通用规范·底线</span></td><td>消防设施</td><td>186</td><td>19</td><td><span class="tag green">现行</span></td></tr>
+          <tr><td class="mono">GB 50444-2008</td><td>建筑灭火器配置验收及检查规范</td><td><span class="tag blue">专项现行</span></td><td>消防器材</td><td>94</td><td>11</td><td><span class="tag green">现行</span></td></tr>
+          <tr><td class="mono">GB 50016-2014(2018版)</td><td>建筑设计防火规范</td><td><span class="tag blue">专项现行</span></td><td>建筑防火</td><td>428</td><td>36</td><td><span class="tag green">现行</span></td></tr>
+          <tr><td class="mono">GBJ 16-87</td><td>建筑设计防火规范（87版）</td><td><span class="tag yellow">历史版本</span></td><td>建筑防火</td><td>356</td><td>—</td><td><span class="tag gray">老楼追溯用</span></td></tr>
+          <tr><td class="mono">GB 30871-2022</td><td>危险化学品企业特殊作业安全规范</td><td><span class="tag blue">专项现行</span></td><td>危险作业</td><td>87</td><td>14</td><td><span class="tag green">现行</span></td></tr>
+          <tr><td class="mono">公安部61号令</td><td>机关、团体、企业、事业单位消防安全管理规定</td><td><span class="tag red">法规</span></td><td>消防管理</td><td>48</td><td>9</td><td><span class="tag green">现行</span></td></tr>
+        </table>
+        <div style="margin-top:10px;font-size:12.5px;color:var(--text2)">🔄 平台国标库更新包 v2026.09 已同步（离线更新包，适用于私有化部署）· 条款支持挂接：判别规则 / 检查项模板 / 处置预案 / 场景处置卡</div>
+      </div>
+
+      <div class="card" id="kbLocal" style="display:none">
+        <h3><span class="dot"></span>院规库（本院制度，安保科自维护）
+          <button class="btn sm pri" style="margin-left:auto" onclick="toast('新增院规：制度条款 or 场景处置卡（两套模板任选）')">+ 新增院规</button></h3>
+        <table class="tb">
+          <tr><th>编号</th><th>名称</th><th>类型</th><th>要点</th><th>已挂规则</th><th>版本</th></tr>
+          <tr><td class="mono">YG-001</td><td>贵重药品库双人双锁管理规定</td><td>管理条款</td><td>开锁须 2 人在场，领用登记留痕</td><td>1</td><td>v2</td></tr>
+          <tr><td class="mono">YG-002</td><td>精神科病房 2 小时巡查规定</td><td>管理条款</td><td>巡查间隔≤2h，漏巡自动提醒升级</td><td>1</td><td>v1</td></tr>
+          <tr><td class="mono">YG-003</td><td>消控室 24h 双人持证值班规定</td><td>管理条款</td><td>无证不得排班，关键操作双人确认</td><td>2</td><td>v3</td></tr>
+          <tr><td class="mono">YG-004</td><td>医院一键报警「一三五」响应规范</td><td><span class="tag blue">标准 → 卡片</span></td><td>1 分钟到场 / 3 分钟处置 / 5 分钟报告联动</td><td>—</td><td>v4</td></tr>
+        </table>
+        <div style="margin-top:10px;font-size:12.5px;color:var(--text2)">💡 院规可严于国标，判别时从严取值；制度类条款可一键生成「场景处置卡」。</div>
+      </div>
+
+      <div class="card" id="kbCard" style="display:none">
+        <h3><span class="dot"></span>院级场景处置卡（SOP 卡片库）
+          <span style="margin-left:auto;display:flex;gap:8px;">
+            <button class="btn sm" onclick="toast('从真实事件复盘生成处置卡（自动带出时间线与缺陷项）')">+ 从案例沉淀</button>
+            <button class="btn sm pri" onclick="toast('新建处置卡：选模板→填步骤（角色/动作/时限/系统动作）')">+ 新建处置卡</button>
+          </span>
+        </h3>
+        <div style="font-size:12.8px;color:var(--text2);background:#f7f9fc;padding:10px 12px;border-radius:6px;margin-bottom:12px;line-height:1.8">
+          每张卡 = 一个真实场景的标准化处置流程（业务场景 + 步骤 + 责任角色 + 时限 + 系统动作）。<br>
+          <b>事前</b>作为培训考试素材 · <b>事中</b>由大脑推荐到接警台和队员手机，按步骤勾选留痕 · <b>事后</b>复盘迭代版本。
+        </div>
+        <table class="tb">
+          <tr><th>卡片编号</th><th>场景名称</th><th>分类</th><th>适用区域</th><th>步骤</th><th>版本</th><th>状态</th></tr>
+          <tr style="cursor:pointer;background:#f6fdfa" onclick="kbCardOpen()"><td class="mono">SC-001</td><td><b>门诊区域精神异常人员骚扰/威胁医务人员</b></td><td>治安</td><td>全院门诊诊区</td><td>5</td><td>v3 <span class="tag green">最新</span></td><td><span class="tag green">启用</span></td></tr>
+          <tr><td class="mono">SC-002</td><td>门诊/病房持刀伤人（暴力伤医）</td><td>治安</td><td>全院</td><td>6</td><td>v2</td><td><span class="tag green">启用</span></td></tr>
+          <tr><td class="mono">SC-003</td><td>夜间急诊醉酒人员滋事</td><td>治安</td><td>急诊科</td><td>4</td><td>v2</td><td><span class="tag green">启用</span></td></tr>
+          <tr><td class="mono">SC-004</td><td>发现无人认领可疑包裹（疑似爆炸物）</td><td>治安/反恐</td><td>全院</td><td>7</td><td>v2</td><td><span class="tag green">启用</span></td></tr>
+          <tr><td class="mono">SC-005</td><td>病区初期火灾处置（含一三五响应）</td><td>消防</td><td>住院部/门诊</td><td>6</td><td>v4</td><td><span class="tag green">启用</span></td></tr>
+          <tr><td class="mono">SC-006</td><td>消控室接烟感报警的误报甄别</td><td>消防</td><td>消控室</td><td>4</td><td>v1</td><td><span class="tag green">启用</span></td></tr>
+          <tr><td class="mono">SC-007</td><td>医用氧气管道/氧站泄漏</td><td>医气/危化</td><td>氧站、病区</td><td>5</td><td>v1</td><td><span class="tag green">启用</span></td></tr>
+          <tr><td class="mono">SC-008</td><td>检验科危化品试剂洒漏</td><td>危化品</td><td>检验科</td><td>5</td><td>v1</td><td><span class="tag green">启用</span></td></tr>
+          <tr style="background:#fff"><td class="mono">SC-009</td><td>电梯困人应急处置</td><td>特种设备</td><td>全院电梯</td><td>4</td><td>v1</td><td><span class="tag green">启用</span></td></tr>
+          <tr><td class="mono">SC-010</td><td>患者走失查找（老年/精神科）</td><td>查找</td><td>全院</td><td>5</td><td>v1</td><td><span class="tag green">启用</span></td></tr>
+          <tr><td class="mono">SC-011</td><td>门诊大厅人员聚集/拉横幅（医闹）</td><td>秩序</td><td>门诊大厅</td><td>6</td><td>v2</td><td><span class="tag green">启用</span></td></tr>
+          <tr><td class="mono">SC-012</td><td>病区发现盗窃/失窃</td><td>治安</td><td>住院部</td><td>5</td><td>v1</td><td><span class="tag green">启用</span></td></tr>
+          <tr><td class="mono">SC-013</td><td>台风/暴雨预警院内响应</td><td>自然灾害</td><td>全院</td><td>联动部署台</td><td>v2</td><td><span class="tag green">启用</span></td></tr>
+        </table>
+      </div>
+
+      <div class="card" id="kbCardDetail" style="display:none;border-top:3px solid #0f6e56">
+        <h3><span class="dot" style="background:#0f6e56"></span>处置卡 SC-001 · v3（最后修订：2026-09-28 李科长）
+          <span style="margin-left:auto;display:flex;gap:8px;">
+            <button class="btn sm" onclick="toast('已生成 3 道考题并加入「新入职保安必训」试卷')">🎓 生成培训考题</button>
+            <button class="btn sm" onclick="toast('已作为演练脚本下发，演练后自动回收执行记录')">📋 用作演练脚本</button>
+            <button class="btn sm" onclick="toast('已导出处置卡 PDF，可制成卡片张贴于诊室')">📄 导出卡片</button>
+          </span>
+        </h3>
+        <div class="grid" style="grid-template-columns:1.3fr 1fr;">
+          <div>
+            <div class="kv" style="grid-template-columns:90px 1fr;">
+              <span class="k">场景描述</span><span>门诊候诊区/诊室内，精神异常人员（患者或陪同人员）对医务人员进行纠缠、辱骂、威胁或轻微肢体冲突</span>
+              <span class="k">识别特征</span><span>言语威胁、反复纠缠拒不离开、推搡物品、随身携带可疑物</span>
+              <span class="k">适用区域</span><span>全院门诊诊区（1 号楼 1-3F）· 已绑定平面图点位 12 处</span>
+              <span class="k">响应要求</span><span style="color:var(--red);font-weight:600">一三五：1 分钟到场 / 3 分钟处置 / 5 分钟报告联动</span>
+              <span class="k">依据</span><span class="mono">国务院令第 421 号《企业事业单位内部治安保卫条例》</span> + 本院 YG-004《一键报警「一三五」响应规范》v4</div>
+            <h3 style="margin:14px 0 8px"><span class="dot" style="background:#0f6e56"></span>处置步骤（卡片正文）</h3>
+            <div class="tl">
+              <div class="ti done"><div class="tt">① 0~1 分钟 · 现场发现人/被骚扰医务人员</div><div class="td">按下诊室<b>一键报警按钮</b>（或小程序一键报警）→ 与被骚扰对象保持距离、避免正面冲突 → 引导周边候诊患者避让，关闭诊室门<b>系统动作</b>：报警点位上图闪烁、自动生成一级事件工单、通知监控中心+最近班组</div></div>
+              <div class="ti done"><div class="tt">② 1 分钟 · 监控中心</div><div class="td">接警弹窗（定位诊室+责任人）→ 立即呼叫最近班组（门诊 1 班组）到场 → 同步通知驻院警务室/警务联系人<b>系统动作</b>：自动派单、调取周边摄像头（二期）、通知链一键触发</div></div>
+              <div class="ti cur"><div class="tt">③ 1~3 分钟 · 现场班组（≥2 人）</div><div class="td">到场将当事人与医务人员<b>物理隔离</b>，稳控情绪、劝离到安保谈话室 → 对方失控时使用防暴盾/约束叉（按器械使用规范，全程录像）→ 涉及精神异常必须报 110 由警方处置<b>系统动作</b>：到场定位打卡、执法记录仪影像回传、110 联动登记</div></div>
+              <div class="ti"><div class="tt">④ 3~5 分钟 · 保卫科/医务科到位</div><div class="td">评估是否需医疗干预（精神科会诊/急诊处置）→ 有人身伤害立即 120 → 保护现场、固定监控录像证据、安抚在场患者<b>系统动作</b>：事件升级标记、证据影像归档、医务科协同通知</div></div>
+              <div class="ti"><div class="tt">⑤ 事后 · 当日 24h 内</div><div class="td">自动生成事件报告（时间线+影像+各方动作）→ 48 小时内复盘会 → 该诊区巡查频次临时加密、后续跟进<b>系统动作</b>：报告归档、复盘意见回收本卡（版本迭代）、该区域巡查计划自动调整 7 天</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="brain-box">
+              <div class="bh">🧠 这张卡怎么被用起来</div>
+              <div style="font-size:12.8px;line-height:2">
+                <b>事前</b>：拆成 3 道考题进「新入职保安必训」；卡片 PDF 张贴诊室<br>
+                <b>事中</b>：一键报警触发 → 大脑按事件类型自动推荐本卡 → 接警台与队员手机同步显示，<b>按步骤勾选打点、超时自动提醒</b><br>
+                <b>事后</b>：全部步骤执行留痕自动进事件报告；复盘意见回到本卡迭代 → v4
+              </div>
+            </div>
+            <div style="margin-top:12px;padding:12px;background:#fffaf2;border:1px solid #f2dfc0;border-radius:8px;font-size:12.5px;line-height:1.9">
+              <b>📌 沉淀来源</b>：2026-08-14 真实事件复盘（门诊 2F 儿科诊区）<br>
+              当时暴露问题：① 一键报警按钮被遮挡、值班台未第一时间定位诊室 ② 到场仅 1 人<br>
+              <b>本次迭代（v2→v3）</b>：明确班组到场不少于 2 人；新增「情绪降级步骤」与取证动作
+            </div>
+            <div style="margin-top:12px;font-size:12.5px;color:var(--text2)">统计：本卡 90 天内被调阅 <b style="color:var(--text)">47 次</b>、实战执行 <b style="color:var(--text)">3 次</b>、关联培训考试 <b style="color:var(--text)">186 人次</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 系统管理 -->
+    <div class="page" id="p-sys">
+      <h2 class="pt">系统管理</h2><div class="pt-sub">多租户 · 模块授权 · 第三方账号 · 数据隔离</div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;">
+        <div class="card">
+          <h3><span class="dot"></span>模块开关（按租户授权）</h3>
+          <table class="tb">
+            <tr><th>模块</th><th>分期</th><th>状态</th></tr>
+            <tr><td>摸底建档</td><td>一期</td><td><span class="switch on" onclick="this.classList.toggle('on')"></span></td></tr>
+            <tr><td>隐患闭环 / 巡查 / 自查 / 培训 / 作业票</td><td>一期</td><td><span class="switch on" onclick="this.classList.toggle('on')"></span></td></tr>
+            <tr><td>AI 视觉识别</td><td>一期</td><td><span class="switch on" onclick="this.classList.toggle('on')"></span></td></tr>
+            <tr><td>视频接入（GB/T 28181）</td><td>二期</td><td><span class="switch" onclick="this.classList.toggle('on')"></span></td></tr>
+            <tr><td>消防 IoT / 大屏 / 门禁访客</td><td>二期</td><td><span class="switch" onclick="this.classList.toggle('on')"></span></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3><span class="dot"></span>账号与数据隔离</h3>
+          <div class="kv" style="grid-template-columns:120px 1fr;">
+            <span class="k">医院职工</span><span>组织架构：安保科 / 总务科 / 各临床科室…</span>
+            <span class="k">第三方单位</span><span>**安保护卫队（32 人）· **物业 · **燃气工程</span>
+            <span class="k">隔离策略</span><span>第三方仅见本单位工单/任务；履约数据单独出数</span>
+            <span class="k">体检报告知悉</span><span>权限配置：院领导 + 安保科（本租户自配）</span>
+            <span class="k">平台运营端</span><span>运营权与数据权分离，不可见本院业务明细</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== 小程序端 ==================== -->
+<div id="mp">
+  <div class="phone">
+    <div class="p-status">📶 微信 · 17:49</div>
+    <div class="p-head">
+      <div style="font-size:15px;font-weight:700" id="mpTitle">安全工作台</div>
+      <div style="font-size:11.5px;opacity:.8;margin-top:3px" id="mpSub">示例三甲医院 · 张班长（住院部班组）</div>
+    </div>
+    <div class="p-body">
+
+      <!-- 首页 -->
+      <div class="mpage on" id="m-home">
+        <div class="mcard" style="display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer" onclick="mpGo('m-assist')">
+          <span style="font-size:18px">💬</span>
+          <span style="font-size:13px;color:#98a2b3">有事直接说：导出上月隐患数据…</span>
+          <span style="margin-left:auto;font-size:11px;color:var(--primary);border:1px solid var(--primary);border-radius:10px;padding:2px 9px">智能助手</span>
+        </div>
+        <div class="ai-card" style="margin-bottom:10px">
+          <div class="ah">🧠 大脑提示</div>
+          <div style="font-size:12.5px;line-height:1.8">今日你班组有 <b>2 条巡查任务</b>未完成；配药室风险区自查已派单至药剂科；灭火器 MHQ-2-3F-003 将于 6 天后到期。</div>
+        </div>
+        <div class="mcard">
+          <div class="mgrid" style="grid-template-columns:repeat(3,1fr)">
+            <div class="gi" onclick="mpGo('m-report')"><div class="ic">📢</div><div class="t">报事服务</div></div>
+            <div class="gi" onclick="mpGo('m-orders')"><div class="ic">📋</div><div class="t">我的工单</div></div>
+            <div class="gi" onclick="mpGo('m-patrol')"><div class="ic">🚶</div><div class="t">巡查任务</div></div>
+            <div class="gi" onclick="mpGo('m-check')"><div class="ic">✅</div><div class="t">风险自查</div></div>
+            <div class="gi" onclick="mpGo('m-train')"><div class="ic">🎓</div><div class="t">安全培训</div></div>
+            <div class="gi" onclick="toast('打开作业票列表')"><div class="ic">🔥</div><div class="t">作业票</div></div>
+            <div class="gi" onclick="toast('打开平面图（移动端查看点位/风险区）')"><div class="ic">🗺</div><div class="t">平面图</div></div>
+            <div class="gi" onclick="mpGo('m-sos')"><div class="ic">🆘</div><div class="t">一键报警</div></div>
+            <div class="gi" onclick="mpGo('m-card')"><div class="ic">🧩</div><div class="t">处置卡</div></div>
+            <div class="gi" onclick="mpGo('m-equip')"><div class="ic">🛗</div><div class="t">特种设备</div></div>
+            <div class="gi" onclick="mpGo('m-rpt')"><div class="ic">📈</div><div class="t">运行报告</div></div>
+            <div class="gi" onclick="mpGo('m-task')"><div class="ic">📌</div><div class="t">我的任务</div></div>
+            <div class="gi" onclick="mpGo('m-vendor')"><div class="ic">🤝</div><div class="t">供应商绩效</div></div>
+          </div>
+        </div>
+        <div class="mcard">
+          <b style="font-size:13px">待办提醒</b>
+          <div style="font-size:12.5px;color:#5b6b80;margin-top:8px;line-height:2">
+            🔴 工单 YH20261004012 处置中，剩 3 天<br>
+            🟡 今日 16:00-18:00 巡查班次 2 个点位未巡<br>
+            🎓 《新入职岗前必训》考试未通过，剩 1 次补考机会
+          </div>
+        </div>
+      </div>
+
+      <!-- 一站式服务入口（报隐患 / 报修 / 报服务） -->
+      <div class="mpage" id="m-report">
+        <div class="mcard" style="padding:11px 14px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <b style="font-size:13.5px">我要报事</b>
+            <span style="margin-left:auto;font-size:11px;color:#8b98aa">科室人员 / 患者家属均可报 · 免登录</span>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button id="svcbtn-hz" onclick="svcType('hz')" style="flex:1;padding:9px;font-size:13px;font-weight:600;border-radius:8px;border:1px solid var(--primary);background:var(--primary);color:#fff">🚨 报隐患</button>
+            <button id="svcbtn-bx" onclick="svcType('bx')" style="flex:1;padding:9px;font-size:13px;font-weight:600;border-radius:8px;border:1px solid var(--primary);background:#fff;color:var(--primary)">🔧 报修</button>
+            <button id="svcbtn-fw" onclick="svcType('fw')" style="flex:1;padding:9px;font-size:13px;font-weight:600;border-radius:8px;border:1px solid var(--primary);background:#fff;color:var(--primary)">🙋 报服务</button>
+          </div>
+          <div id="svcTip" style="margin-top:9px;font-size:12px;color:#5b6b80;line-height:1.8">安全问题直接报：通道占用、消防设施异常、违规用电、可疑人员… → <b>进入隐患闭环</b>，按等级限时整改并回告</div>
+        </div>
+
+        <!-- 报隐患 -->
+        <div class="mcard" id="svc-hz">
+          <b style="font-size:13.5px">🚨 报隐患</b>
+          <div class="photo-box" style="margin-top:10px" id="photoBox" onclick="aiDemo()">
+            <div style="font-size:26px">📷</div><div style="font-size:12.5px">点击拍照 / 从相册选择</div>
+          </div>
+          <div id="aiResult" style="display:none;margin-top:10px">
+            <div class="ai-card">
+              <div class="ah">✨ AI 预识别 <span style="font-weight:400;font-size:11px;color:#8b7fd4">置信度 87% · 仅供建议，请确认</span></div>
+              <div style="font-size:12.8px;line-height:2">
+                疑似类型：<b>疏散通道占用</b><br>
+                描述草稿：走廊被病床及杂物占用，影响人员通行<br>
+                疑似违反：<span class="mono" style="font-size:11.5px">GB 55037-2022 §7.1.5</span>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:10px">
+                <button class="mbtn" style="flex:1;padding:9px;font-size:13px" onclick="toast('已采纳 AI 建议')">✓ 采纳</button>
+                <button class="mbtn ghost" style="flex:1;padding:9px;font-size:13px" onclick="toast('请手动修改类型与描述')">修改</button>
+                <button class="mbtn ghost" style="flex:1;padding:9px;font-size:13px;color:#98a2b3;border-color:#d5dce6" onclick="toast('已关闭 AI 建议，按原始内容上报')">忽略</button>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:12.5px;color:#5b6b80;line-height:1.9">
+            📍 位置：自动定位水印（2 号楼 3F）<br>
+            🏷 隐患类型：待 AI 识别后确认
+          </div>
+          <button class="mbtn" style="margin-top:12px" onclick="toast('已提交隐患 YH20261004018 → 研判后派单；进度可在「我的上报」查看')">提交上报</button>
+        </div>
+
+        <!-- 报修 -->
+        <div class="mcard" id="svc-bx" style="display:none">
+          <b style="font-size:13.5px">🔧 报修</b>
+          <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:10px">
+            <span class="svc-chip" onclick="svcChip(this)">门锁</span><span class="svc-chip" onclick="svcChip(this)">照明</span><span class="svc-chip" onclick="svcChip(this)">水电</span><span class="svc-chip" onclick="svcChip(this)">门窗</span><span class="svc-chip" onclick="svcChip(this)">电梯异响</span><span class="svc-chip" onclick="svcChip(this)">卫生间设施</span><span class="svc-chip" onclick="svcChip(this)">空调</span><span class="svc-chip" onclick="svcChip(this)">其他</span>
+          </div>
+          <div class="photo-box" style="margin-top:10px;height:98px" onclick="toast('已拍照：门诊 2F 女卫门锁损坏.jpg')">
+            <div style="font-size:22px">📷</div><div style="font-size:12.5px">拍照（可选，方便判断故障）</div>
+          </div>
+          <div style="margin-top:10px;font-size:12.5px;color:#5b6b80;line-height:1.9">
+            📍 位置：自动定位（门诊 2F 女卫生间）<br>
+            ⏱ 响应时限：<b>30 分钟内响应</b>，一般故障 24 小时内处理<br>
+            🔀 系统路由：后勤保障部 / 设备科（可配，二期对接后勤系统）
+          </div>
+          <button class="mbtn" style="margin-top:12px" onclick="toast('已提交报修 BX20261004031 → 已路由至后勤保障部，30 分钟内响应')">提交报修</button>
+        </div>
+
+        <!-- 报服务 -->
+        <div class="mcard" id="svc-fw" style="display:none">
+          <b style="font-size:13.5px">🙋 报服务（安保服务类）</b>
+          <div class="mgrid" style="grid-template-columns:repeat(3,1fr);margin-top:10px">
+            <div class="gi" onclick="toast('寻人/走失：已触发广播+监控调阅+班组搜寻，同步推送最近出入口')"><div class="ic">🔍</div><div class="t">寻人走失</div></div>
+            <div class="gi" onclick="toast('物品遗失：登记物品特征+最后出现位置，匹配失物招领库')"><div class="ic">🎒</div><div class="t">物品遗失</div></div>
+            <div class="gi" onclick="toast('车辆协助：挪车/搭电/轮椅坡道指引，派就近岗位')"><div class="ic">🚗</div><div class="t">车辆协助</div></div>
+            <div class="gi" onclick="toast('纠纷调解：按场景处置卡 SC-002 推送班组到场稳控，同步通知医务科')"><div class="ic">🕊</div><div class="t">纠纷调解</div></div>
+            <div class="gi" onclick="toast('护送陪检：安排岗位人员护送，记录起止地点与时间')"><div class="ic">🦺</div><div class="t">护送陪检</div></div>
+            <div class="gi" onclick="toast('开门/门禁协助：核验身份后远程或现场协助')"><div class="ic">🔑</div><div class="t">开门协助</div></div>
+            <div class="gi" onclick="toast('搬运协助：安排人员协助搬运大件/重物')"><div class="ic">📦</div><div class="t">搬运协助</div></div>
+            <div class="gi" onclick="toast('咨询建议：进入服务工单，2 小时内答复')"><div class="ic">💬</div><div class="t">咨询建议</div></div>
+            <div class="gi" onclick="toast('投诉：直达安保科，48 小时内反馈处理结果')"><div class="ic">📣</div><div class="t">投诉</div></div>
+          </div>
+          <div style="margin-top:10px;font-size:12.5px;color:#5b6b80;line-height:1.9">
+            ⏱ 承诺响应：<b>10 分钟内</b>，到场时限按服务类别配置<br>
+            📍 位置：自动定位，可补充楼层与附近标志物
+          </div>
+          <button class="mbtn" style="margin-top:12px" onclick="toast('已提交服务申请 FW20261004007 → 安保班组 10 分钟内响应')">提交服务申请</button>
+        </div>
+
+        <div class="mcard" style="font-size:12.5px;color:#5b6b80;line-height:1.9">
+          💡 <b>上报后怎么跟踪？</b><br>
+          职工：在「我的上报」看全过程进度；患者/家属：提交后获得<b>查询码</b>，微信服务通知推送每一步进展，完成后可评价。<br>
+          🔀 三类诉求在受理池自动分流——隐患进安全闭环、报修转后勤、服务进服务工单，<b>各走各的时限，不会混排</b>。
+        </div>
+      </div>
+
+      <!-- 我的工单 -->
+      <div class="mpage" id="m-orders">
+        <div class="mcard" style="border-left:3px solid var(--red)">
+          <b style="font-size:13.5px">YH20261004012 · 疏散通道被占用</b>
+          <div style="font-size:12px;color:#5b6b80;margin:6px 0">住院部 3F · 二级 · 接单倒计时 <span style="color:var(--red);font-weight:700">02:41</span></div>
+          <div style="display:flex;gap:8px">
+            <button class="mbtn" style="flex:1;padding:9px;font-size:13px" onclick="toast('已接单，到场后请定位打卡')">接单</button>
+            <button class="mbtn ghost" style="flex:1;padding:9px;font-size:13px" onclick="toast('已申请改派，等待值班员确认')">申请改派</button>
+          </div>
+        </div>
+        <div class="mcard" style="border-left:3px solid var(--orange)">
+          <b style="font-size:13.5px">YH20261004011 · 灭火器压力不足</b>
+          <div style="font-size:12px;color:#5b6b80;margin:6px 0">门诊 1F · 三级 · 处置中 · 剩 2 天</div>
+          <button class="mbtn" style="padding:9px;font-size:13px" onclick="toast('上传处置后照片并填写整改说明')">上传处置结果</button>
+        </div>
+      </div>
+
+      <!-- 巡查 -->
+      <div class="mpage" id="m-patrol">
+        <div class="mcard">
+          <b style="font-size:13.5px">今日巡查 · 住院部线（4/6 点位）</b>
+          <div style="font-size:12px;color:#5b6b80;margin:4px 0 10px">已到点打卡 ✓ 3F 东走廊 · 按检查表逐项检查（都是人话，照着答）</div>
+          <div class="chk">灭火器压力表指针在绿区吗？<div class="st"><button class="ok" onclick="this.parentNode.parentNode.style.opacity=.5;toast('已记录：正常')">正常</button><button class="bad" onclick="toast('已转隐患工单并提示拍照')">异常</button></div></div>
+          <div class="chk">瓶体有无锈蚀、喷管有无开裂？<div class="st"><button class="ok" onclick="this.parentNode.parentNode.style.opacity=.5">正常</button><button class="bad">异常</button></div></div>
+          <div class="chk">通道有无堆放杂物、被占用？<div class="st"><button class="ok" onclick="this.parentNode.parentNode.style.opacity=.5">正常</button><button class="bad" onclick="toast('已转隐患工单')">异常</button></div></div>
+          <div class="chk" style="border:none">安全出口指示灯亮吗？<div class="st"><button class="ok" onclick="this.parentNode.parentNode.style.opacity=.5">正常</button><button class="bad">异常</button></div></div>
+          <div class="ai-card" style="margin-top:8px">
+            <div class="ah">📸 拍照项 · AI 辅助判断</div>
+            <div style="font-size:12.5px;color:#5b6b80;line-height:1.8">拍摄压力表 → AI 读数「指针疑似在黄区」→ 请你确认。看不懂表也能巡。</div>
+            <button class="mbtn ghost" style="margin-top:8px;padding:8px;font-size:12.5px" onclick="toast('拍照 → AI 分析中… → 请确认识别结果')">拍照检查</button>
+          </div>
+          <button class="mbtn" style="margin-top:12px" onclick="toast('本点位巡查完成，已打卡下一目的地')">提交本点位</button>
+        </div>
+      </div>
+
+      <!-- 风险自查 -->
+      <div class="mpage" id="m-check">
+        <div class="mcard">
+          <b style="font-size:13.5px">配药室每日自查 🔴红区</b>
+          <div style="font-size:12px;color:#5b6b80;margin:4px 0 10px">责任人：药剂科 陈** · 今日 17:00 前完成（逾期升级）</div>
+          <div class="chk">双人双锁都锁好了吗？<div class="st"><button class="ok">正常</button><button class="bad" onclick="toast('命中院规「双人双锁」· 闭环式 · 自动开单')">异常</button></div></div>
+          <div class="chk">温湿度在登记范围内吗？<div class="st"><button class="ok">正常</button><button class="bad">异常</button></div></div>
+          <div class="chk" style="border:none">有无无关人员进出迹象？<div class="st"><button class="ok">正常</button><button class="bad">异常</button></div></div>
+          <button class="mbtn" style="margin-top:12px" onclick="toast('自查完成，记录已归档并计入科室自查率')">提交自查</button>
+        </div>
+      </div>
+
+      <!-- 培训 -->
+      <div class="mpage" id="m-train">
+        <div class="mcard">
+          <b style="font-size:13.5px">《新入职保安岗前必训》</b>
+          <div style="font-size:12px;color:#5b6b80;margin:4px 0 10px">规则：学时 ≥4h + 考试 80 分合格 · 剩补考 1 次 · 10-10 截止</div>
+          <div style="background:#1a2233;border-radius:8px;height:150px;display:flex;align-items:center;justify-content:center;color:#8ba0bb;flex-direction:column;gap:8px">
+            <div style="font-size:30px">▶️</div><div style="font-size:12px">第三章 · 消防器材使用（12:36 / 18:00）</div>
+          </div>
+          <div style="height:6px;background:#eef1f5;border-radius:3px;margin-top:10px"><div style="width:68%;height:6px;background:var(--green);border-radius:3px"></div></div>
+          <div style="font-size:11.5px;color:#98a2b3;margin-top:5px">已学 2.7h / 4h · 防挂学时：完整播放才计时</div>
+          <button class="mbtn" style="margin-top:12px" onclick="document.getElementById('mquiz').style.display='block';this.style.display='none'">进入补考</button>
+        </div>
+        <div class="mcard" id="mquiz" style="display:none">
+          <b style="font-size:13.5px">补考 · 随机抽题（2/10）</b>
+          <div class="quiz-q">
+            <div class="q">灭火器压力表指针在哪个区域表示可以正常使用？</div>
+            <label onclick="pickOpt(this)"><input type="radio" name="q1">红区</label>
+            <label onclick="pickOpt(this)"><input type="radio" name="q1">绿区</label>
+            <label onclick="pickOpt(this)"><input type="radio" name="q1">黄区</label>
+          </div>
+          <div class="quiz-q" style="border:none">
+            <div class="q">发现疏散通道被占用，正确做法是？</div>
+            <label onclick="pickOpt(this)"><input type="radio" name="q2">与己无关，继续巡查</label>
+            <label onclick="pickOpt(this)"><input type="radio" name="q2">立即清理并随手拍上报</label>
+            <label onclick="pickOpt(this)"><input type="radio" name="q2">只口头提醒科室</label>
+          </div>
+          <button class="mbtn" style="margin-top:8px" onclick="toast('已交卷：92 分，合格！培训档案已更新')">交卷</button>
+        </div>
+      </div>
+
+      <!-- 一键报警 -->
+      <div class="mpage" id="m-sos">
+        <div class="mcard" style="text-align:center;padding:30px 16px">
+          <div style="width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,#ff6b68,#d64541);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 0 0 12px rgba(214,69,65,.12),0 0 0 26px rgba(214,69,65,.06)" onmousedown="toast('🚨 报警已触发！位置+上报人已推送监控中心与消控室')">
+            <div style="font-size:30px">🆘</div><div style="font-size:13px;font-weight:700;margin-top:4px">长按报警</div>
+          </div>
+          <div style="font-size:12.5px;color:#5b6b80;margin-top:18px;line-height:2">
+            触发后自动上报：<b>当前定位 + 你的身份 + 时间</b><br>
+            监控中心接警台即时弹窗 · 一级事件同步通知科长<br>
+            <span style="color:#98a2b3">（二期：联动就近摄像头画面 + 消控室联动）</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 智能助手 -->
+      <div class="mpage" id="m-assist">
+        <div class="mcard">
+          <b style="font-size:13.5px">💬 智能助手</b>
+          <div style="font-size:12px;color:#98a2b3;margin-top:2px">查数据 · 办业务 · 教操作</div>
+          <div style="margin-top:10px">
+            <div class="msg u" style="max-width:88%">导出近1个月的隐患数据</div>
+            <div class="msg a" style="max-width:88%">📊 已生成：09-07~10-07 隐患数据共 28 条<br><span class="act" onclick="toast('已导出 Excel 到手机，可转发')">⬇ 导出</span></div>
+            <div class="msg u" style="max-width:88%">自查在哪做？</div>
+            <div class="msg a" style="max-width:88%">点下方「巡查」旁的自查入口，或我带你过去 👇<br><span class="act ghost" onclick="mpGo('m-check')">去风险区自查</span></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <input placeholder="输入需求…" style="flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-size:13px;outline:none">
+            <button class="mbtn" style="width:auto;padding:9px 16px;font-size:13px" onclick="toast('演示环境：请在 PC 端助手体验完整交互')">发送</button>
+          </div>
+          <div style="font-size:11.5px;color:#98a2b3;margin-top:10px;line-height:1.7">🔒 权限提示：你只可查询本科室数据；部署类需求将转办安保科</div>
+        </div>
+      </div>
+
+      <!-- 场景处置卡（现场执行） -->
+      <div class="mpage" id="m-card">
+        <div class="mcard" style="border-left:3px solid var(--red)">
+          <b style="font-size:13.5px">🚨 当前执行：SC-001 门诊区域人员骚扰</b>
+          <div style="font-size:12px;color:#5b6b80;margin:6px 0 10px">监控中心已下发 · 一三五响应：1 分钟到场 / 3 分钟处置 / 5 分钟报告</div>
+        </div>
+        <div class="mcard">
+          <div class="chk" style="opacity:.5">① 0~1分 按下一键报警 · 拉开距离 · 引导患者避让<div class="st"><span class="tag green">已完成</span></div></div>
+          <div class="chk" style="opacity:.5">② 1分 监控中心呼最近班组 + 通知警务室<div class="st"><span class="tag green">已完成</span></div></div>
+          <div class="chk">③ <b>1~3分 到场隔离、稳控情绪</b> · 失控用防暴叉<div class="st"><span style="color:var(--red);font-weight:700">剩 01:12</span></div></div>
+          <div class="chk">④ 3~5分 保卫科/医务科到位 · 评估 120 · 固定证据<div class="st"><span class="tag gray">待执行</span></div></div>
+          <div class="chk" style="border:none">⑤ 24h内 事件报告 + 48h复盘<div class="st"><span class="tag gray">待执行</span></div></div>
+          <div style="margin-top:10px;padding:9px 11px;background:#fff7f7;border-radius:8px;font-size:12.5px;color:#a32d2d;line-height:1.8">
+            ⚠️ 注意：到场不少于 2 人；涉及精神异常必须报 110；全程执法记录仪录像
+          </div>
+          <button class="mbtn" style="margin-top:12px" onclick="toast('已打卡第③步完成，自动记录时间并进入第④步')">完成第③步 · 到场打卡</button>
+          <button class="mbtn ghost" style="margin-top:8px" onclick="toast('已呼叫支援：通知班组长+驻院警务室')">呼叫支援</button>
+        </div>
+        <div class="mcard" style="font-size:12.5px;color:#5b6b80;line-height:1.9">
+          💡 现场不用背流程——手机上这张卡照着做，每步打勾自动留痕，超时会提醒班长。平时培训考的就是这些卡。
+        </div>
+      </div>
+
+      <!-- 我的任务（科员统一入口） -->
+      <div class="mpage" id="m-task">
+        <div class="mcard" style="background:linear-gradient(135deg,#123f7b,#1b6fd1);color:#fff">
+          <div style="font-size:11.5px;opacity:.85">2026-10-08 星期四</div>
+          <b style="font-size:15px">今日待办 5 项</b>
+          <div style="font-size:12.5px;opacity:.9;margin-top:6px">2 项今日到期 · 1 项临近超时</div>
+        </div>
+        <div class="mcard">
+          <b style="font-size:13px">我的事项（全部来源）</b>
+          <div style="font-size:12.5px;color:#5b6b80;margin-top:8px;line-height:2.1">
+            🔴 <span style="color:var(--text)">隐患工单</span> YH20261004012 通道占用 · 今日 18:00<br>
+            🟠 <span style="color:var(--text)">作业票审批</span> 食堂动火票 · 4 小时内<br>
+            🔵 <span style="color:var(--text)">巡查任务</span> 16:00-18:00 班次 2 点位<br>
+            🔵 <span style="color:var(--text)">风险自查</span> 药剂科贵重药品库<br>
+            🟢 <span style="color:var(--text)">科内任务</span> 迎检材料整理 · 10-12
+          </div>
+        </div>
+        <div class="mcard">
+          <b style="font-size:13.5px">📌 迎检材料整理（三甲评审）</b>
+          <div style="font-size:12px;color:#5b6b80;margin:6px 0 10px">王科长派单 · 截止 10-12（剩 3 天）· 优先级高</div>
+          <div style="background:#eef1f5;border-radius:4px;height:7px;"><div style="width:60%;background:var(--primary);height:7px;border-radius:4px;"></div></div>
+          <div style="font-size:11.5px;color:var(--text2);margin-top:5px">进度 60% · 协办：李科员、张班长</div>
+          <div class="chk">收集各科室安全台账<div class="st"><span class="tag green">已完成</span></div></div>
+          <div class="chk">导出巡查与隐患记录<div class="st"><span class="tag green">已完成</span></div></div>
+          <div class="chk" style="border:none">特种设备检验报告归集<div class="st"><span class="tag orange">待办</span></div></div>
+          <button class="mbtn" style="margin-top:12px" onclick="toast('已填写进展：完成消防章节佐证整理，进度更新为 70%，附照片 2 张')">填写进展 · 更新进度</button>
+          <button class="mbtn ghost" style="margin-top:8px" onclick="toast('已提交完成，附交付物清单，待科长验收')">提交完成</button>
+        </div>
+        <div class="mcard">
+          <b style="font-size:13px">自建任务</b>
+          <div style="font-size:12.5px;color:#5b6b80;margin-top:8px;line-height:2">
+            📝 私有：整理电梯维保合同到期清单<br>
+            📝 已上报：联系第三方确认夜班增派 · 10-12
+          </div>
+          <button class="mbtn ghost" style="margin-top:10px" onclick="toast('新建个人任务：可设私有或上报科长，支持子任务与清单')">+ 新建任务</button>
+        </div>
+        <div class="mcard" style="font-size:12.5px;color:#5b6b80;line-height:1.9">
+          💡 打开系统就看到全部要干的事：业务待办自动汇入、科内任务自己跟进，不用翻群聊和本子。
+        </div>
+      </div>
+
+      <!-- 供应商绩效（第三方视角） -->
+      <div class="mpage" id="m-vendor">
+        <div class="mcard" style="background:linear-gradient(135deg,#eaf3ff,#f7faff);border:1px solid #d6e6fb">
+          <div style="display:flex;align-items:center">
+            <div>
+              <div style="font-size:12px;color:#6b7c93">康洁物业 · 2026 年 9 月绩效</div>
+              <div style="font-size:30px;font-weight:800;color:var(--green);line-height:1.2">88.1</div>
+              <div style="font-size:12px;color:#6b7c93"><span class="tag green">绿牌</span> 排名第 2 / 6 · 较上月 ↑0.6</div>
+            </div>
+            <div style="margin-left:auto;text-align:right;font-size:12px;color:#6b7c93;line-height:1.9">
+              达标 6 项<br>扣分项 1<br>待整改 1
+            </div>
+          </div>
+        </div>
+        <div class="mcard">
+          <b style="font-size:13.5px">指标明细</b>
+          <div style="margin-top:8px;font-size:12.8px;line-height:2.1;color:#5b6b80">
+            <div style="display:flex"><span>响应及时率</span><span style="margin-left:auto;color:var(--green)">97% / 目标 95% ✓</span></div>
+            <div style="display:flex"><span>到场及时率</span><span style="margin-left:auto;color:var(--green)">96% / 目标 95% ✓</span></div>
+            <div style="display:flex"><span>按期完成率</span><span style="margin-left:auto;color:var(--green)">94% / 目标 95% · 接近</span></div>
+            <div style="display:flex"><span>一次验收合格率</span><span style="margin-left:auto;color:var(--orange)">86% / 目标 90%</span></div>
+            <div style="display:flex"><span>人员在岗率</span><span style="margin-left:auto;color:var(--green)">100% ✓</span></div>
+            <div style="display:flex"><span>培训完成率</span><span style="margin-left:auto;color:var(--green)">100% ✓</span></div>
+          </div>
+        </div>
+        <div class="mcard" style="border-left:3px solid var(--red)">
+          <b style="font-size:13.5px">扣分与整改通知</b>
+          <div style="margin-top:8px;font-size:12.8px;line-height:1.9">
+            <b>-1.5 分</b> · 门诊 3F 保洁工单验收退回<br>
+            <span style="color:#8b98aa">整改通知 No.TZ202609008 · 限期 3 日（剩 1 天）</span>
+          </div>
+          <button class="mbtn" style="margin-top:10px;padding:10px" onclick="toast('已上传整改后照片与说明，等待安保科复核')">上传整改结果</button>
+          <button class="mbtn ghost" style="margin-top:8px;padding:10px" onclick="toast('申诉已提交：该区域当日有院方会议占用，附现场照片证据 → 等待安保科复核')">📣 对本次扣分申诉</button>
+        </div>
+        <div class="mcard">
+          <b style="font-size:13.5px">绩效报告</b>
+          <div style="margin-top:8px;font-size:12.5px;color:#5b6b80;line-height:1.9">月度报告由安保科发布后可见；双方确认后归档，纸质签字件由院方留存。</div>
+          <button class="mbtn ghost" style="margin-top:10px;padding:10px" onclick="toast('已下载《2026年8月履约绩效评估报告》PDF（8 月报告已双方确认）')">📑 下载上月报告</button>
+        </div>
+      </div>
+
+      <!-- 特种设备 -->
+      <div class="mpage" id="m-equip">
+        <div class="ai-card" style="margin-bottom:10px">
+          <div class="ah">🧠 大脑提示</div>
+          <div style="font-size:12.5px;line-height:1.8">你有 <b>2 项特种设备任务</b>：EQ-DT-012 医用电梯 3# 每 15 日维保（今日到期）；EQ-BL-001 锅炉每日自行检查。</div>
+        </div>
+        <div class="mcard">
+          <b style="font-size:13.5px">🛗 EQ-DT-012 医用电梯 3# · 维保执行</b>
+          <div style="font-size:12px;color:#5b6b80;margin:6px 0 10px">住院部 1F 大厅 · 每 15 日一次（TSG T5002）· 上次 09-28</div>
+          <div class="chk">轿厢内检验合格标志在有效期内<div class="st"><button class="ok">正常</button><button class="bad">异常</button></div></div>
+          <div class="chk">应急报警装置/对讲通话正常<div class="st"><button class="ok">正常</button><button class="bad">异常</button></div></div>
+          <div class="chk">层门门锁、轿门防夹有效<div class="st"><button class="ok">正常</button><button class="bad">异常</button></div></div>
+          <div class="chk" style="border:none">维保现场拍照（维保单位签字）<div class="st"><span class="tag blue">📷 必拍</span></div></div>
+          <button class="mbtn" style="margin-top:12px" onclick="toast('维保完成已提交：到场打卡 09:12、维保项全勾选、照片 3 张、电子签字 → 归入一机一档')">提交维保记录 · 电子签字</button>
+          <button class="mbtn ghost" style="margin-top:8px" onclick="toast('已查看该设备一机一档：登记证+历次检验报告+维保记录 82 条')">查看一机一档</button>
+        </div>
+        <div class="mcard" style="font-size:12.5px;color:#5b6b80;line-height:1.9">
+          💡 检验到期、维保超期、证书到期都由大脑自动盯，不用人记周期；漏保会自动开单并计入维保单位履约考核。
+        </div>
+      </div>
+
+      <!-- 安全运行报告（院领导/管理者） -->
+      <div class="mpage" id="m-rpt">
+        <div class="mcard" style="background:linear-gradient(135deg,#123f7b,#1b6fd1);color:#fff">
+          <div style="font-size:11.5px;opacity:.85">2026-09-01 ~ 2026-09-30</div>
+          <b style="font-size:15px">9 月安全运行报告</b>
+          <div style="font-size:12.5px;opacity:.9;margin-top:6px">总体平稳 · 无较大及以上安全事件</div>
+        </div>
+        <div class="mcard">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:8px">
+            <div><div style="font-size:19px;font-weight:700;color:var(--green)">93.2%</div><div style="font-size:11px;color:#98a2b3">整改率 ↑1.8%</div></div>
+            <div><div style="font-size:19px;font-weight:700">96.4%</div><div style="font-size:11px;color:#98a2b3">巡查完成</div></div>
+            <div><div style="font-size:19px;font-weight:700">98.1%</div><div style="font-size:11px;color:#98a2b3">风险区自查</div></div>
+          </div>
+        </div>
+        <div class="mcard">
+          <b style="font-size:13px">需关注</b>
+          <div style="font-size:12.5px;color:#5b6b80;margin-top:8px;line-height:2">
+            🔴 医用高压氧舱超期未检 8 天（已停用待检）<br>
+            🟠 住院部 3F 通道占用 12 起，占本月同类 29%<br>
+            🟠 第三方保安夜班漏点 55 次
+          </div>
+        </div>
+        <div class="mcard">
+          <b style="font-size:13px">🧠 大脑工作建议</b>
+          <div style="font-size:12.5px;color:#5b6b80;margin-top:8px;line-height:1.9">
+            ① 住院部 3F 增设每日 2 次专项巡查并纳入考核；② 与医务科协商加床上限；③ 第三方夜班增派 1 人；④ 下月组织疏散通道专项清理。
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="mbtn" onclick="toast('已打开完整报告：12 章节，可下钻到原始单据')">📄 查看完整报告</button>
+          <button class="mbtn ghost" style="flex:0 0 110px" onclick="toast('已下载 PDF，可打印签字存档（双轨制）')">下载 PDF</button>
+        </div>
+        <div class="mcard" style="font-size:12.5px;color:#5b6b80;line-height:1.9">
+          💡 报告由系统自动归集各模块数据生成，AI 成文、科长审核；报告给谁看由医院自行配置可见范围。
+        </div>
+      </div>
+
+    </div>
+    <div class="p-tab">
+      <button class="on" onclick="mpGo('m-home',this)"><span class="ti">🏠</span>首页</button>
+      <button onclick="mpGo('m-orders',this)"><span class="ti">📋</span>工单</button>
+      <button onclick="mpGo('m-patrol',this)"><span class="ti">🚶</span>巡查</button>
+      <button onclick="mpGo('m-train',this)"><span class="ti">🎓</span>培训</button>
+    </div>
+  </div>
+</div>
+
+<div id="assistBtn" onclick="document.getElementById('assistPanel').classList.toggle('open')">💬</div>
+<div id="assistPanel">
+  <div class="ap-h">智能助手<small>查数据 · 办业务 · 教操作 —— 直接说人话</small></div>
+  <div class="ap-b" id="assistBody">
+    <div class="msg a">你好，我是系统智能助手。你可以这样说：<br>「导出近 1 个月的隐患数据」<br>「帮我新增配电房巡查任务」<br>「灭火器检查标准是哪条」</div>
+  </div>
+  <div class="ap-quick">
+    <button onclick="assistSend('导出近1个月的隐患数据')">导出隐患数据</button>
+    <button onclick="assistSend('帮我新增配电房巡查任务')">新增巡查任务</button>
+    <button onclick="assistSend('台风要来了怎么办')">台风怎么办</button>
+    <button onclick="assistSend('灭火器检查标准是哪条')">问条款</button>
+  </div>
+  <div class="ap-i">
+    <input id="assistInput" placeholder="输入你的需求…" onkeydown="if(event.key==='Enter')assistSend()">
+    <button onclick="assistSend()">发送</button>
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),2400);}
+function tabBtn(b){b.parentNode.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');}
+function svcType(k){
+  ['hz','bx','fw'].forEach(function(x){
+    var p=document.getElementById('svc-'+x); if(p) p.style.display=(x===k)?'block':'none';
+    var b=document.getElementById('svcbtn-'+x); if(!b) return;
+    if(x===k){b.style.background='var(--primary)';b.style.color='#fff';}
+    else{b.style.background='#fff';b.style.color='var(--primary)';}
+  });
+  var tip={
+    hz:'安全问题直接报：通道占用、消防设施异常、违规用电、可疑人员… → <b>进入隐患闭环</b>，按等级限时整改并回告',
+    bx:'设施设备故障报修：门锁、照明、水电、门窗、电梯异响… → <b>按路由规则转后勤/设备科</b>，30 分钟响应',
+    fw:'需要安保协助：寻人走失、物品遗失、纠纷调解、护送、开门、搬运… → <b>进服务工单</b>，10 分钟响应'
+  };
+  document.getElementById('svcTip').innerHTML=tip[k];
+}
+function svcChip(el){
+  el.parentNode.querySelectorAll('.svc-chip').forEach(function(x){x.classList.remove('on');});
+  el.classList.add('on');
+}
+function taskView(k){
+  ['board','mine','recur'].forEach(function(x){
+    document.getElementById('tv-'+x).style.display=(x===k)?((x==='board')?'grid':'block'):'none';
+  });
+}
+function rptRange(k){
+  const map={'周报':'2026-09-28 ~ 2026-10-04','月报':'2026-09-01 ~ 2026-09-30','季报':'2026-07-01 ~ 2026-09-30','年报':'2026-01-01 ~ 2026-12-31','自定义':'自定义区间'};
+  document.getElementById('rptRangeTxt').textContent=map[k]||'—';
+  document.getElementById('rptCustom').style.display=(k==='自定义')?'block':'none';
+}
+function switchEnv(env){
+  document.getElementById('pc').style.display=env==='pc'?'flex':'none';
+  document.getElementById('mp').classList.toggle('on',env==='mp');
+  document.getElementById('btnPC').classList.toggle('on',env==='pc');
+  document.getElementById('btnMP').classList.toggle('on',env==='mp');
+}
+document.querySelectorAll('#side .mi').forEach(el=>el.addEventListener('click',()=>{
+  document.querySelectorAll('#side .mi').forEach(x=>x.classList.remove('on'));el.classList.add('on');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.getElementById('p-'+el.dataset.p).classList.add('on');
+}));
+function go(p){document.querySelector('#side .mi[data-p="'+p+'"]').click();}
+function mpGo(id,btn){
+  document.querySelectorAll('.mpage').forEach(p=>p.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  document.getElementById('mp').scrollIntoView();
+  const titles={'m-home':'安全工作台','m-report':'报事服务','m-orders':'我的工单','m-patrol':'巡查任务','m-check':'风险区自查','m-train':'安全培训','m-sos':'一键报警','m-assist':'智能助手','m-card':'场景处置卡','m-equip':'特种设备','m-rpt':'安全运行报告','m-task':'我的任务','m-vendor':'供应商绩效'};
+  document.getElementById('mpTitle').textContent=titles[id]||'安全工作台';
+  if(btn){document.querySelectorAll('.p-tab button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+}
+function toggleLayer(id,el){
+  const g=document.getElementById(id);
+  g.style.display=g.style.display==='none'?'':'none';
+  el.classList.toggle('layer-off');
+}
+const pointDB={
+ 'MHQ-2-3F-001':['灭火器 MHQ-2-3F-001','手提式干粉 4kg','充装日期：2026-03-12','下次检验：2027-03-11','状态：<span class="tag green">正常</span>','近 90 天巡查：26 次，异常 0 次'],
+ 'MHQ-2-3F-002':['灭火器 MHQ-2-3F-002','手提式干粉 4kg','充装日期：2026-03-12','下次检验：2027-03-11','状态：<span class="tag green">正常</span>','—'],
+ 'MHQ-2-3F-003':['灭火器 MHQ-2-3F-003','手提式干粉 4kg','充装日期：2025-10-10','下次检验：2026-10-10','状态：<span class="tag yellow">6 天后到期</span>','🧠 大脑已触发临期预警（提醒式）'],
+ 'XHS-2-3F-001':['室内消火栓 XHS-2-3F-001','管径 DN65 · 水压正常','最近试压：2026-09-15','状态：<span class="tag green">正常</span>','—','—'],
+ 'DQ-2-3F-001':['重点电器 DQ-2-3F-001','库房电暖器 2.2kW','所属科室：内科病区','状态：<span class="tag orange">纳入每日自查</span>','—','—'],
+};
+function showPoint(id){
+  const d=pointDB[id];if(!d)return;
+  document.getElementById('pointInfo').innerHTML=
+   '<b style="font-size:14px;color:var(--text)">'+d[0]+'</b><br>'+
+   d[1]+'<br>'+d[2]+'<br>'+d[3]+'<br>'+d[4]+'<br>'+
+   '<span style="font-size:12px">'+d[5]+'</span>'+
+   '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+
+   '<button class="btn sm" onclick="toast(\'已打开该点位完整档案（含历次巡查/隐患记录）\')">完整档案</button>'+
+   '<button class="btn sm" onclick="toast(\'已导出该点位档案卡（可打印张贴二维码）\')">导出档案卡</button></div>';
+  toast('已定位点位 '+id);
+}
+function aiDemo(){
+  const box=document.getElementById('photoBox');
+  box.innerHTML='<div style="font-size:26px">🖼</div><div style="font-size:12.5px">已拍摄：走廊被病床占用.jpg</div>';
+  box.style.borderStyle='solid';
+  const r=document.getElementById('aiResult');r.style.display='block';
+  r.querySelector('.ai-card').style.opacity=.3;
+  toast('AI 分析中…');
+  setTimeout(()=>{r.querySelector('.ai-card').style.opacity=1;toast('AI 识别完成，请确认建议');},900);
+}
+function pickOpt(l){
+  l.parentNode.querySelectorAll('label').forEach(x=>x.classList.remove('sel'));
+  l.classList.add('sel');l.querySelector('input').checked=true;
+}
+function startDeploy(k){
+  if(k==='typhoon'){
+    document.getElementById('deployDetail').style.display='block';
+    toast('大脑已按场景模板+本院档案生成方案包（8 项任务），请逐项确认');
+    document.getElementById('deployDetail').scrollIntoView({behavior:'smooth'});
+  }
+  if(k==='review'){
+    const d=document.getElementById('reviewDetail');
+    d.style.display='block';
+    toast('已按评审条款+本院档案生成 32 项证明材料清单，21 项系统自动归集完成');
+    d.scrollIntoView({behavior:'smooth'});
+  }
+}
+function kbTab(btn,id){
+  btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  ['kbStd','kbLocal','kbCard'].forEach(x=>document.getElementById(x).style.display=(x===id)?'':'none');
+  if(id!=='kbCard')document.getElementById('kbCardDetail').style.display='none';
+  if(id==='kbCard')kbCardOpen();
+}
+function kbCardOpen(){
+  document.getElementById('kbCardDetail').style.display='block';
+  document.getElementById('kbCardDetail').scrollIntoView({behavior:'smooth'});
+}
+function assistSend(txt){
+  const input=document.getElementById('assistInput');
+  const text=txt||input.value.trim();if(!text)return;
+  const body=document.getElementById('assistBody');
+  body.insertAdjacentHTML('beforeend','<div class="msg u">'+text+'</div>');
+  input.value='';
+  let reply='';
+  if(/导出|隐患数据|报表|统计/.test(text)){
+    reply='📊 已为你生成：<b>2026-09-07 ~ 2026-10-07 隐患数据</b><br>共 28 条（闭环 19 · 进行中 7 · 超时 2），含位置/类型/等级/处理时长全字段。<br><span class="act" onclick="toast(\'已导出 Excel：隐患数据_20260907-20261007.xlsx\')">⬇ 导出 Excel</span> <span class="act ghost" onclick="toast(\'已按科室拆分生成统计图表\')">看图表</span>';
+  }else if(/巡查任务|配电房/.test(text)){
+    reply='好的，新增「配电房」巡查任务。我按巡查业务流程整理如下，请确认：<br>· 点位：2号楼 B1 配电房（档案已有）<br>· 频次：每日 1 次<br>· 检查表：电气安全 8 项（大脑按 GB 50140/院规生成）<br>· 责任班组：设备科班组<br><span class="act" onclick="assistConfirm(this)">✓ 确认发布</span> <span class="act ghost" onclick="toast(\'请直接说要修改哪项，如「频次改为每班1次」\')">修改</span>';
+  }else if(/台风/.test(text)){
+    reply='🌀 这属于专项工作部署（管理事项）。建议走「工作部署台·防台风场景」，大脑可按本院档案生成方案包。<br>已为你通知安保科科长，部署台台风卡片已亮起建议。<br><span class="act" onclick="go(\'deploy\');document.getElementById(\'assistPanel\').classList.remove(\'open\')">🚀 打开工作部署台</span>';
+  }else if(/条款|标准|哪条|规定/.test(text)){
+    reply='📚 灭火器日常检查依据：<br>· <span class="mono">GB 50444-2008 §5.2</span> 灭火器应每月检查一次<br>· <span class="mono">GB 50444-2008 §5.3</span> 维修与报废期限（干粉出厂满 5 年首次维修）<br>· 本院院规：重点部位灭火器每半月检查<br><span class="act ghost" onclick="go(\'kb\');document.getElementById(\'assistPanel\').classList.remove(\'open\')">查看条款全文</span>';
+  }else{
+    reply='我理解你想「'+text+'」。这个需求我还不能直接办理，可以换个说法，或告诉我它属于：查数据 / 新增任务 / 问标准 / 找功能。';
+  }
+  setTimeout(()=>{body.insertAdjacentHTML('beforeend','<div class="msg a">'+reply+'</div>');body.scrollTop=body.scrollHeight;},500);
+  body.scrollTop=body.scrollHeight;
+}
+function assistConfirm(el){
+  el.parentNode.insertAdjacentHTML('afterend','<div class="msg a">✅ 已发布：配电房每日巡查任务已生效，检查表已推送设备科班组，班组长微信已通知。<br><span class="act ghost" onclick="go(\'orders\');document.getElementById(\'assistPanel\').classList.remove(\'open\')">查看巡查计划</span></div>');
+  el.parentNode.querySelectorAll('.act').forEach(b=>b.remove());
+  toast('任务已发布并留痕（操作人/确认记录可查）');
+}
+</script>
+</body>
+</html>
